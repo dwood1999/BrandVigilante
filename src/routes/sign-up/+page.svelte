@@ -10,22 +10,33 @@
     let showPassword = false;
     let formData: ActionData | null = null;
 
+    interface SubmitResult {
+        type: 'success' | 'failure';
+        data?: {
+            email: FormDataEntryValue;
+            phone: FormDataEntryValue;
+            first_name: FormDataEntryValue;
+            last_name: FormDataEntryValue;
+        };
+    }
+
     function handleSubmit() {
         loading = true;
-        return async ({ result }) => {
+        return async ({ result }: { result: SubmitResult }) => {
             loading = false;
             if (result.type === 'failure') {
                 try {
-                    // Parse the error data if it's a string
-                    if (typeof result.data === 'string') {
-                        formData = JSON.parse(result.data);
-                    } else {
-                        formData = result.data;
-                    }
+                    formData = result;
                 } catch (error) {
                     console.error('Error parsing form response:', error);
                     formData = {
-                        message: 'An unexpected error occurred. Please try again.'
+                        message: 'An unexpected error occurred. Please try again.',
+                        data: result.data || {
+                            email: '',
+                            phone: '',
+                            first_name: '',
+                            last_name: ''
+                        }
                     };
                 }
             } else if (result.type === 'success') {

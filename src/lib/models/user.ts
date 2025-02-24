@@ -38,14 +38,18 @@ export interface PaginatedUsers {
 
 // User model class with static methods for database operations
 export class UserModel {
-    static async findAll(): Promise<User[]> {
-        const [rows] = await pool.query<UserRow[]>(
-            'SELECT id, email, phone, role, created_at FROM users'
-        );
-        return rows.map(row => ({
-            ...row,
-            created_at: row.created_at.toISOString()
-        }));
+    static async findAll(): Promise<UserRow[]> {
+        try {
+            const [users] = await pool.query<UserRow[]>(
+                `SELECT id, email, phone, role, first_name, last_name, created_at, email_verified 
+                 FROM users 
+                 ORDER BY created_at DESC`
+            );
+            return users;
+        } catch (error) {
+            logger.error('Error in UserModel.findAll:', error);
+            throw error;
+        }
     }
 
     static async findById(id: number): Promise<UserRow | null> {
@@ -155,5 +159,35 @@ export class UserModel {
             perPage,
             totalPages: Math.ceil(total / perPage)
         };
+    }
+
+    static async count(): Promise<number> {
+        try {
+            const [result] = await pool.query<RowDataPacket[]>(
+                'SELECT COUNT(*) as count FROM users'
+            );
+            return parseInt(result[0].count);
+        } catch (error) {
+            logger.error('Error in UserModel.count:', error);
+            throw error;
+        }
+    }
+
+    static async findByBrandId(brandId: number): Promise<UserRow[]> {
+        try {
+            const [users] = await pool.query<UserRow[]>(
+                `SELECT u.id, u.email, u.phone, u.role, u.first_name, u.last_name, 
+                        u.created_at, u.email_verified 
+                 FROM users u 
+                 JOIN brands_user bu ON u.id = bu.user_id 
+                 WHERE bu.brand_id = ? 
+                 ORDER BY u.first_name, u.last_name`,
+                [brandId]
+            );
+            return users;
+        } catch (error) {
+            logger.error('Error in UserModel.findByBrandId:', error);
+            throw error;
+        }
     }
 } 

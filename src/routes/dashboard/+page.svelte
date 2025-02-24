@@ -79,6 +79,13 @@
                                 Brand Management
                             </a>
                             <a
+                                href="/admin/terms"
+                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                data-sveltekit-preload
+                            >
+                                Trademark Terms
+                            </a>
+                            <a
                                 href="/admin/marketplaces"
                                 class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 data-sveltekit-preload

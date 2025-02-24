@@ -12,18 +12,11 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     try {
-        const brands = await BrandModel.findAll({
-            include: ['trademarked_terms', 'users', 'marketplaces']
-        });
-
-        return {
-            brands
-        };
+        const brands = await BrandModel.findAll();
+        return { brands };
     } catch (error) {
         logger.error('Error loading brands:', error);
-        return {
-            brands: []
-        };
+        throw error;
     }
 };
 

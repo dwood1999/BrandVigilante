@@ -2,10 +2,21 @@ import { pool } from '$lib/db';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { logger } from '$lib/logger';
 
-interface MarketplaceRow extends RowDataPacket {
+export interface MarketplaceRow extends RowDataPacket {
     marketplace_id: number;
     name: string;
     url: string;
+    status: 'active' | 'inactive';
+}
+
+export interface BrandMarketplaceRow extends RowDataPacket {
+    marketplace_id: number;
+    name: string;
+    url: string;
+    status: 'active' | 'inactive';
+    created_at: Date;
+    updated_at: Date | null;
+    notes: string | null;
 }
 
 export interface Marketplace extends MarketplaceRow {
@@ -31,29 +42,18 @@ export class MarketplaceModel {
             const [result] = await pool.query<RowDataPacket[]>(
                 'SELECT COUNT(*) as count FROM marketplaces'
             );
-            return result[0].count;
+            return parseInt(result[0].count);
         } catch (error) {
             logger.error('Error in MarketplaceModel.count:', error);
             throw error;
         }
     }
 
-    static async findAll(): Promise<Marketplace[]> {
+    static async findAll(): Promise<MarketplaceRow[]> {
         try {
-            const [marketplaces] = await pool.query<MarketplaceRow[]>('SELECT * FROM marketplaces');
-
-            // Get associated brands for each marketplace
-            for (const marketplace of marketplaces) {
-                const [brands] = await pool.query<RowDataPacket[]>(
-                    `SELECT b.brand_id, b.name 
-                     FROM brands b 
-                     JOIN brand_marketplaces bm ON b.brand_id = bm.brand_id 
-                     WHERE bm.marketplace_id = ?`,
-                    [marketplace.marketplace_id]
-                );
-                marketplace.brands = brands;
-            }
-
+            const [marketplaces] = await pool.query<MarketplaceRow[]>(
+                'SELECT * FROM marketplaces ORDER BY name'
+            );
             return marketplaces;
         } catch (error) {
             logger.error('Error in MarketplaceModel.findAll:', error);
@@ -61,14 +61,17 @@ export class MarketplaceModel {
         }
     }
 
-    static async findById(id: number): Promise<Marketplace | null> {
+    static async findById(marketplaceId: number): Promise<Marketplace | null> {
         try {
+            // Get marketplace details
             const [marketplaces] = await pool.query<MarketplaceRow[]>(
                 'SELECT * FROM marketplaces WHERE marketplace_id = ?',
-                [id]
+                [marketplaceId]
             );
-            
-            if (!marketplaces[0]) return null;
+
+            if (marketplaces.length === 0) {
+                return null;
+            }
 
             const marketplace = marketplaces[0];
 
@@ -77,14 +80,34 @@ export class MarketplaceModel {
                 `SELECT b.brand_id, b.name 
                  FROM brands b 
                  JOIN brand_marketplaces bm ON b.brand_id = bm.brand_id 
-                 WHERE bm.marketplace_id = ?`,
-                [marketplace.marketplace_id]
+                 WHERE bm.marketplace_id = ? 
+                 ORDER BY b.name`,
+                [marketplaceId]
             );
-            marketplace.brands = brands;
 
-            return marketplace;
+            return {
+                ...marketplace,
+                brands
+            };
         } catch (error) {
             logger.error('Error in MarketplaceModel.findById:', error);
+            throw error;
+        }
+    }
+
+    static async findByBrandId(brandId: number): Promise<BrandMarketplaceRow[]> {
+        try {
+            const [marketplaces] = await pool.query<BrandMarketplaceRow[]>(
+                `SELECT m.*, bm.created_at, bm.status
+                 FROM marketplaces m
+                 JOIN brand_marketplaces bm ON m.marketplace_id = bm.marketplace_id
+                 WHERE bm.brand_id = ?
+                 ORDER BY m.name`,
+                [brandId]
+            );
+            return marketplaces;
+        } catch (error) {
+            logger.error('Error in MarketplaceModel.findByBrandId:', error);
             throw error;
         }
     }
@@ -102,11 +125,11 @@ export class MarketplaceModel {
         }
     }
 
-    static async update(id: number, data: UpdateMarketplaceData): Promise<void> {
+    static async update(marketplaceId: number, data: UpdateMarketplaceData): Promise<void> {
         try {
-            await pool.query<ResultSetHeader>(
+            await pool.query(
                 'UPDATE marketplaces SET name = ?, url = ? WHERE marketplace_id = ?',
-                [data.name, data.url, id]
+                [data.name, data.url, marketplaceId]
             );
         } catch (error) {
             logger.error('Error in MarketplaceModel.update:', error);
@@ -114,11 +137,35 @@ export class MarketplaceModel {
         }
     }
 
-    static async delete(id: number): Promise<void> {
+    static async delete(marketplaceId: number): Promise<void> {
         try {
-            await pool.query('DELETE FROM marketplaces WHERE marketplace_id = ?', [id]);
+            await pool.query('DELETE FROM marketplaces WHERE marketplace_id = ?', [marketplaceId]);
         } catch (error) {
             logger.error('Error in MarketplaceModel.delete:', error);
+            throw error;
+        }
+    }
+
+    static async addToBrand(brandId: number, marketplaceId: number): Promise<void> {
+        try {
+            await pool.query(
+                'INSERT INTO brand_marketplaces (brand_id, marketplace_id) VALUES (?, ?)',
+                [brandId, marketplaceId]
+            );
+        } catch (error) {
+            logger.error('Error in MarketplaceModel.addToBrand:', error);
+            throw error;
+        }
+    }
+
+    static async removeFromBrand(brandId: number, marketplaceId: number): Promise<void> {
+        try {
+            await pool.query(
+                'DELETE FROM brand_marketplaces WHERE brand_id = ? AND marketplace_id = ?',
+                [brandId, marketplaceId]
+            );
+        } catch (error) {
+            logger.error('Error in MarketplaceModel.removeFromBrand:', error);
             throw error;
         }
     }

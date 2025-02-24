@@ -7,108 +7,109 @@ interface BrandRow extends RowDataPacket {
     name: string;
     url: string;
     description: string;
+    status: 'active' | 'inactive';
+    created_at: string;
+    updated_at: string;
 }
 
 interface TrademarkTermRow extends RowDataPacket {
-    id: number;
+    term_id: number;
     term: string;
 }
 
-interface UserRow extends RowDataPacket {
-    id: number;
-    email: string;
-    first_name: string;
-    last_name: string;
-}
-
-interface MarketplaceRow extends RowDataPacket {
-    id: number;
+interface BrandMarketplaceRow extends RowDataPacket {
+    marketplace_id: number;
     name: string;
     url: string;
 }
 
 export interface Brand extends BrandRow {
-    trademarked_terms?: TrademarkTermRow[];
-    users?: UserRow[];
-    marketplaces?: MarketplaceRow[];
+    trademark_terms?: {
+        term_id: number;
+        term: string;
+    }[];
+    marketplaces?: {
+        marketplace_id: number;
+        name: string;
+        url: string;
+    }[];
 }
 
 export interface CreateBrandData {
     name: string;
-    url?: string;
-    description?: string;
 }
 
 export interface UpdateBrandData {
     name: string;
-    url?: string;
-    description?: string;
 }
 
-type Include = ('trademarked_terms' | 'users' | 'marketplaces')[];
-
 export class BrandModel {
-    static async findAll({ include = [] as Include } = {}): Promise<Brand[]> {
+    static async findAll(): Promise<Brand[]> {
         try {
-            const [brands] = await pool.query<BrandRow[]>('SELECT * FROM brands');
-
-            for (const brand of brands) {
-                if (include.includes('trademarked_terms')) {
-                    const [terms] = await pool.query<TrademarkTermRow[]>(
-                        'SELECT * FROM trademarked_terms WHERE brand_id = ?',
-                        [brand.brand_id]
-                    );
-                    brand.trademarked_terms = terms;
-                }
-
-                if (include.includes('users')) {
-                    const [users] = await pool.query<UserRow[]>(
-                        `SELECT u.id, u.email, u.first_name, u.last_name 
-                         FROM users u 
-                         JOIN brands_user bu ON u.id = bu.user_id 
-                         WHERE bu.brand_id = ?`,
-                        [brand.brand_id]
-                    );
-                    brand.users = users;
-                }
-
-                if (include.includes('marketplaces')) {
-                    const [marketplaces] = await pool.query<MarketplaceRow[]>(
-                        `SELECT m.* 
-                         FROM marketplaces m 
-                         JOIN brand_marketplaces bm ON m.marketplace_id = bm.marketplace_id 
-                         WHERE bm.brand_id = ?`,
-                        [brand.brand_id]
-                    );
-                    brand.marketplaces = marketplaces;
-                }
-            }
-
-            return brands as Brand[];
+            const [brands] = await pool.query<BrandRow[]>(
+                'SELECT * FROM brands ORDER BY name'
+            );
+            return brands;
         } catch (error) {
             logger.error('Error in BrandModel.findAll:', error);
             throw error;
         }
     }
 
-    static async delete(brandId: number): Promise<void> {
+    static async findById(brandId: number): Promise<Brand | null> {
         try {
-            await pool.query<ResultSetHeader>(
-                'DELETE FROM brands WHERE brand_id = ?', 
+            // Get brand details
+            const [brands] = await pool.query<BrandRow[]>(
+                'SELECT * FROM brands WHERE brand_id = ?',
                 [brandId]
             );
+
+            if (brands.length === 0) {
+                return null;
+            }
+
+            const brand = brands[0];
+
+            // Get trademark terms
+            const [terms] = await pool.query<TrademarkTermRow[]>(
+                'SELECT term_id, term FROM brand_tmterms WHERE brand_id = ? ORDER BY term',
+                [brandId]
+            );
+
+            // Get marketplaces
+            const [marketplaces] = await pool.query<BrandMarketplaceRow[]>(
+                `SELECT m.marketplace_id, m.name, m.url 
+                 FROM marketplaces m 
+                 JOIN brand_marketplaces bm ON m.marketplace_id = bm.marketplace_id 
+                 WHERE bm.brand_id = ? 
+                 ORDER BY m.name`,
+                [brandId]
+            );
+
+            return {
+                ...brand,
+                trademark_terms: terms,
+                marketplaces: marketplaces
+            };
         } catch (error) {
-            logger.error('Error in BrandModel.delete:', error);
+            logger.error('Error in BrandModel.findById:', error);
             throw error;
         }
     }
 
-    static async count(): Promise<number> {
+    static async findByUserId(userId: number): Promise<Brand[]> {
         try {
-            const [result] = await pool.query<RowDataPacket[]>('SELECT COUNT(*) as count FROM brands');
-            return result[0].count;
+            const [brands] = await pool.query<BrandRow[]>(
+                `SELECT b.* 
+                 FROM brands b 
+                 JOIN brands_user bu ON b.brand_id = bu.brand_id 
+                 WHERE bu.user_id = ? 
+                 ORDER BY b.name`,
+                [userId]
+            );
+            return brands;
         } catch (error) {
-            logger.error('Error in BrandModel.count:', error);
+            logger.error('Error in BrandModel.findByUserId:', error);
             throw error;
         }
     }
@@ -116,8 +117,8 @@ export class BrandModel {
     static async create(data: CreateBrandData): Promise<number> {
         try {
             const [result] = await pool.query<ResultSetHeader>(
-                'INSERT INTO brands (name, url, description) VALUES (?, ?, ?)',
-                [data.name, data.url || null, data.description || null]
+                'INSERT INTO brands (name) VALUES (?)',
+                [data.name]
             );
             return result.insertId;
         } catch (error) {
@@ -126,27 +127,59 @@ export class BrandModel {
         }
     }
 
-    static async findById(brandId: number): Promise<Brand | null> {
+    static async update(brandId: number, data: UpdateBrandData): Promise<void> {
         try {
-            const [brands] = await pool.query<BrandRow[]>(
-                'SELECT * FROM brands WHERE brand_id = ?',
-                [brandId]
+            await pool.query(
+                'UPDATE brands SET name = ? WHERE brand_id = ?',
+                [data.name, brandId]
             );
-            return brands[0] || null;
         } catch (error) {
-            logger.error('Error in BrandModel.findById:', error);
+            logger.error('Error in BrandModel.update:', error);
             throw error;
         }
     }
 
-    static async update(brandId: number, data: UpdateBrandData): Promise<void> {
+    static async delete(brandId: number): Promise<void> {
         try {
-            await pool.query<ResultSetHeader>(
-                'UPDATE brands SET name = ?, url = ?, description = ? WHERE brand_id = ?',
-                [data.name, data.url || null, data.description || null, brandId]
+            await pool.query('DELETE FROM brands WHERE brand_id = ?', [brandId]);
+        } catch (error) {
+            logger.error('Error in BrandModel.delete:', error);
+            throw error;
+        }
+    }
+
+    static async addUser(brandId: number, userId: number): Promise<void> {
+        try {
+            await pool.query(
+                'INSERT INTO brands_user (brand_id, user_id) VALUES (?, ?)',
+                [brandId, userId]
             );
         } catch (error) {
-            logger.error('Error in BrandModel.update:', error);
+            logger.error('Error in BrandModel.addUser:', error);
+            throw error;
+        }
+    }
+
+    static async removeUser(brandId: number, userId: number): Promise<void> {
+        try {
+            await pool.query(
+                'DELETE FROM brands_user WHERE brand_id = ? AND user_id = ?',
+                [brandId, userId]
+            );
+        } catch (error) {
+            logger.error('Error in BrandModel.removeUser:', error);
+            throw error;
+        }
+    }
+
+    static async count(): Promise<number> {
+        try {
+            const [result] = await pool.query<RowDataPacket[]>(
+                'SELECT COUNT(*) as count FROM brands WHERE status = "active"'
+            );
+            return parseInt(result[0].count);
+        } catch (error) {
+            logger.error('Error in BrandModel.count:', error);
             throw error;
         }
     }

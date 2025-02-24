@@ -12,22 +12,17 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     try {
-        const [
-            brands,
-            users,
-            terms,
-            marketplaces
-        ] = await Promise.all([
-            BrandModel.count(),
+        const [users, brands, terms, marketplaces] = await Promise.all([
             UserModel.count(),
+            BrandModel.count(),
             TrademarkTermModel.count(),
             MarketplaceModel.count()
         ]);
 
         return {
             stats: {
-                brands,
                 users,
+                brands,
                 terms,
                 marketplaces
             }
@@ -36,8 +31,8 @@ export const load: PageServerLoad = async ({ locals }) => {
         logger.error('Error loading admin dashboard stats:', error);
         return {
             stats: {
-                brands: 0,
                 users: 0,
+                brands: 0,
                 terms: 0,
                 marketplaces: 0
             }
