@@ -3,7 +3,7 @@ import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { logger } from '$lib/logger';
 
 interface TrademarkTermRow extends RowDataPacket {
-    term_id: number;
+    id: number;
     brand_id: number;
     term: string;
     created_at: string;
@@ -30,7 +30,7 @@ export class TrademarkTermModel {
             const [terms] = await pool.query<TrademarkTermRow[]>(
                 `SELECT t.*, b.name as brand_name 
                  FROM brand_tmterms t 
-                 JOIN brands b ON t.brand_id = b.brand_id 
+                 JOIN brands b ON t.brand_id = b.id 
                  ORDER BY b.name, t.term`
             );
             return terms;
@@ -45,8 +45,8 @@ export class TrademarkTermModel {
             const [terms] = await pool.query<TrademarkTermRow[]>(
                 `SELECT t.*, b.name as brand_name 
                  FROM brand_tmterms t 
-                 JOIN brands b ON t.brand_id = b.brand_id 
-                 WHERE t.term_id = ?`,
+                 JOIN brands b ON t.brand_id = b.id 
+                 WHERE t.id = ?`,
                 [termId]
             );
             return terms[0] || null;
@@ -61,7 +61,7 @@ export class TrademarkTermModel {
             const [terms] = await pool.query<TrademarkTermRow[]>(
                 `SELECT t.*, b.name as brand_name 
                  FROM brand_tmterms t 
-                 JOIN brands b ON t.brand_id = b.brand_id 
+                 JOIN brands b ON t.brand_id = b.id 
                  WHERE t.brand_id = ? 
                  ORDER BY t.term`,
                 [brandId]
@@ -77,7 +77,7 @@ export class TrademarkTermModel {
         try {
             // Check for duplicate term
             const [existing] = await pool.query<TrademarkTermRow[]>(
-                'SELECT term_id FROM brand_tmterms WHERE brand_id = ? AND term = ?',
+                'SELECT id FROM brand_tmterms WHERE brand_id = ? AND term = ?',
                 [data.brand_id, data.term]
             );
 
@@ -98,9 +98,9 @@ export class TrademarkTermModel {
 
     static async update(termId: number, data: UpdateTrademarkTermData): Promise<void> {
         try {
-            // Check for duplicate term (excluding current term)
+            // Check for duplicate term
             const [existing] = await pool.query<TrademarkTermRow[]>(
-                'SELECT term_id FROM brand_tmterms WHERE brand_id = ? AND term = ? AND term_id != ?',
+                'SELECT id FROM brand_tmterms WHERE brand_id = ? AND term = ? AND id != ?',
                 [data.brand_id, data.term, termId]
             );
 
@@ -109,7 +109,7 @@ export class TrademarkTermModel {
             }
 
             await pool.query(
-                'UPDATE brand_tmterms SET brand_id = ?, term = ? WHERE term_id = ?',
+                'UPDATE brand_tmterms SET brand_id = ?, term = ? WHERE id = ?',
                 [data.brand_id, data.term, termId]
             );
         } catch (error) {
@@ -120,7 +120,7 @@ export class TrademarkTermModel {
 
     static async delete(termId: number): Promise<void> {
         try {
-            await pool.query('DELETE FROM brand_tmterms WHERE term_id = ?', [termId]);
+            await pool.query('DELETE FROM brand_tmterms WHERE id = ?', [termId]);
         } catch (error) {
             logger.error('Error in TrademarkTermModel.delete:', error);
             throw error;
@@ -129,9 +129,8 @@ export class TrademarkTermModel {
 
     static async exists(termId: number): Promise<boolean> {
         try {
-            const [result] = await pool.query<TrademarkTermRow[]>(
-                'SELECT term_id FROM brand_tmterms WHERE term_id = ?',
-                [termId]
+            const [result] = await pool.query<RowDataPacket[]>(
+                'SELECT id FROM brand_tmterms WHERE id = ?', [termId]
             );
             return result.length > 0;
         } catch (error) {

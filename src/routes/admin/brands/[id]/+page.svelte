@@ -32,7 +32,7 @@
         
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/users`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userIds: selectedUsers })
@@ -52,7 +52,7 @@
     const handleUserRemoval = async (userId: number) => {
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/users`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/users`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userIds: [userId] })
@@ -223,7 +223,7 @@
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-900">Trademark Terms</h3>
                 <a
-                    href="/admin/terms/new?brand={data.brand.brand_id}"
+                    href="/admin/terms/new?brand={data.brand.id}"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                 >
                     Add New Term
@@ -246,7 +246,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            {#each data.terms as term (term.term_id)}
+                            {#each data.terms as term (term.id)}
                                 <tr>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                         {term.term}
@@ -255,7 +255,7 @@
                                         {new Date(term.created_at).toLocaleDateString()}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="/admin/terms/{term.term_id}/edit" class="text-blue-600 hover:text-blue-900">
+                                        <a href="/admin/terms/{term.id}/edit" class="text-blue-600 hover:text-blue-900">
                                             Edit
                                         </a>
                                     </td>

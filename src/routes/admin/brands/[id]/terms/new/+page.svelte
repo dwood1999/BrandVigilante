@@ -26,7 +26,7 @@
             </div>
             <div class="mt-4 flex md:ml-4 md:mt-0">
                 <a
-                    href="/admin/brands/{data.brand.brand_id}/manage?tab=terms"
+                    href="/admin/brands/{data.brand.id}/manage?tab=terms"
                     class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                 >
                     Back to Terms
@@ -44,7 +44,7 @@
                     await update();
                     
                     if (result.type === 'success') {
-                        window.location.href = `/admin/brands/${data.brand.brand_id}/manage?tab=terms`;
+                        window.location.href = `/admin/brands/${data.brand.id}/manage?tab=terms`;
                     }
                 };
             }}

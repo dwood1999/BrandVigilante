@@ -14,8 +14,10 @@ export interface PageData {
 export interface Brand {
     id: number;
     name: string;
-    url: string;
-    description: string;
+    display_name: string;
+    url: string | null;
+    description: string | null;
+    status: 'active' | 'inactive';
     trademarked_terms?: {
         id: number;
         term: string;

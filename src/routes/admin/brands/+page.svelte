@@ -62,13 +62,13 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <a
-                                        href="/admin/brands/{brand.brand_id}/manage"
+                                        href="/admin/brands/{brand.id}/manage"
                                         class="text-blue-600 hover:text-blue-900 mr-4"
                                     >
                                         Manage
                                     </a>
                                     <a
-                                        href="/admin/brands/{brand.brand_id}/edit"
+                                        href="/admin/brands/{brand.id}/edit"
                                         class="text-blue-600 hover:text-blue-900"
                                     >
                                         Edit

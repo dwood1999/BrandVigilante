@@ -13,11 +13,16 @@ export const actions: Actions = {
     default: async ({ request }) => {
         const formData = await request.formData();
         const name = formData.get('name')?.toString().trim();
+        const display_name = formData.get('display_name')?.toString().trim();
         const url = formData.get('url')?.toString().trim();
         const description = formData.get('description')?.toString().trim();
 
         if (!name) {
             return fail(400, { error: 'Brand name is required' });
+        }
+
+        if (!display_name) {
+            return fail(400, { error: 'Display name is required' });
         }
 
         if (url && !isValidUrl(url)) {
@@ -27,6 +32,7 @@ export const actions: Actions = {
         try {
             await BrandModel.create({
                 name,
+                display_name,
                 url: url || undefined,
                 description: description || undefined
             });

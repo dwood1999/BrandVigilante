@@ -71,7 +71,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        {#each filteredTerms as term (term.term_id)}
+                        {#each filteredTerms as term, index (term.id || index)}
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                                     {term.term}
@@ -81,12 +81,16 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end space-x-2">
-                                        <a
-                                            href="/admin/terms/{term.term_id}/edit"
-                                            class="text-blue-600 hover:text-blue-900"
-                                        >
-                                            Edit
-                                        </a>
+                                        {#if term.id}
+                                            <a
+                                                href="/admin/terms/{term.id}/edit"
+                                                class="text-blue-600 hover:text-blue-900"
+                                            >
+                                                Edit
+                                            </a>
+                                        {:else}
+                                            <span class="text-gray-400">Edit</span>
+                                        {/if}
                                         <form
                                             action="?/deleteTerm"
                                             method="POST"
@@ -98,10 +102,11 @@
                                                 };
                                             }}
                                         >
-                                            <input type="hidden" name="termId" value={term.term_id}>
+                                            <input type="hidden" name="termId" value={term.id || ''}>
                                             <button
                                                 type="submit"
                                                 class="text-red-600 hover:text-red-900"
+                                                disabled={!term.id}
                                             >
                                                 Delete
                                             </button>

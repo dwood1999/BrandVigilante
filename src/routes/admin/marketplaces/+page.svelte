@@ -11,9 +11,13 @@
 
     $: {
         filteredMarketplaces = data.marketplaces.filter(marketplace => 
-            marketplace.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            marketplace.url.toLowerCase().includes(searchQuery.toLowerCase())
+            marketplace.platform_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            marketplace.base_url.toLowerCase().includes(searchQuery.toLowerCase())
         );
+    }
+
+    function confirmDelete(event: MouseEvent) {
+        return confirm('Are you sure you want to delete this marketplace?');
     }
 </script>
 
@@ -52,32 +56,32 @@
         <!-- Marketplace List -->
         <div class="mt-6 overflow-hidden bg-white shadow sm:rounded-md">
             <ul role="list" class="divide-y divide-gray-200">
-                {#each filteredMarketplaces as marketplace (marketplace.marketplace_id)}
+                {#each filteredMarketplaces as marketplace (marketplace.id)}
                     <li>
                         <div class="px-4 py-4 sm:px-6">
                             <div class="flex items-center justify-between">
                                 <div class="truncate">
                                     <div class="flex text-sm">
                                         <p class="font-medium text-blue-600 truncate">
-                                            {marketplace.name}
+                                            {marketplace.platform_name}
                                         </p>
                                     </div>
                                     <div class="mt-2 flex">
                                         <div class="flex items-center text-sm text-gray-500">
                                             <a 
-                                                href={marketplace.url} 
+                                                href={marketplace.base_url} 
                                                 target="_blank" 
                                                 rel="noopener noreferrer"
                                                 class="hover:text-blue-600"
                                             >
-                                                {marketplace.url}
+                                                {marketplace.base_url}
                                             </a>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="ml-2 flex flex-shrink-0">
                                     <a
-                                        href="/admin/marketplaces/{marketplace.marketplace_id}/edit"
+                                        href="/admin/marketplaces/{marketplace.id}/edit"
                                         class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mr-2"
                                     >
                                         Edit
@@ -85,37 +89,19 @@
                                     <form
                                         action="?/deleteMarketplace"
                                         method="POST"
-                                        use:enhance={() => {
-                                            return async () => {
-                                                const confirmed = confirm('Are you sure you want to delete this marketplace?');
-                                                return confirmed;
-                                            };
-                                        }}
+                                        use:enhance
                                     >
-                                        <input type="hidden" name="marketplaceId" value={marketplace.marketplace_id}>
+                                        <input type="hidden" name="marketplaceId" value={marketplace.id}>
                                         <button
                                             type="submit"
                                             class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-700 shadow-sm ring-1 ring-inset ring-red-600/10 hover:bg-red-100"
+                                            on:click={confirmDelete}
                                         >
                                             Delete
                                         </button>
                                     </form>
                                 </div>
                             </div>
-                            {#if marketplace.brands && marketplace.brands.length > 0}
-                                <div class="mt-2">
-                                    <div class="text-sm text-gray-500">
-                                        Associated Brands:
-                                        <div class="mt-1 flex flex-wrap gap-2">
-                                            {#each marketplace.brands as brand}
-                                                <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                                    {brand.name}
-                                                </span>
-                                            {/each}
-                                        </div>
-                                    </div>
-                                </div>
-                            {/if}
                         </div>
                     </li>
                 {/each}

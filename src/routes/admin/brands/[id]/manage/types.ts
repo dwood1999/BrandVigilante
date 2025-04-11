@@ -19,8 +19,12 @@ export interface Marketplace {
     status: 'active' | 'inactive';
 }
 
-export interface BrandMarketplace extends Marketplace {
-    created_at: string | Date;
+export interface BrandMarketplace {
+    id: number;
+    name: string;
+    url: string;
+    status: string;
+    created_at: string;
 }
 
 export interface PageData {

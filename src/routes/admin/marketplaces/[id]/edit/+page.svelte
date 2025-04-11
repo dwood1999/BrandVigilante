@@ -14,23 +14,45 @@
     interface FormErrors {
         error?: string;
         fieldErrors?: {
-            name?: string;
-            url?: string;
+            platform_name?: string;
+            base_url?: string;
+            currency_code?: string;
+            country_code?: string;
+            external_id?: string;
         };
     }
 
     export let data: PageData;
     export let form: FormErrors;
     
+    console.log('Page data:', data);
+    console.log('Marketplace data:', data.marketplace);
+    
     let loading = false;
-    let name = data.marketplace.name;
-    let url = data.marketplace.url;
+    
+    // Initialize form fields with marketplace data
+    let platform_name = data.marketplace?.platform_name || '';
+    let base_url = data.marketplace?.base_url || '';
+    let currency_code = data.marketplace?.currency_code || '';
+    let country_code = data.marketplace?.country_code || '';
+    let external_id = data.marketplace?.external_id || '';
 
-    $: isValid = name.trim().length > 0 && url.trim().length > 0;
+    console.log('Form values:', {
+        platform_name,
+        base_url,
+        currency_code,
+        country_code,
+        external_id
+    });
+
+    $: isValid = platform_name.trim().length > 0 && 
+                 base_url.trim().length > 0 && 
+                 currency_code.trim().length > 0 && 
+                 country_code.trim().length > 0;
 </script>
 
 <svelte:head>
-    <title>Edit Marketplace: {data.marketplace.name} - Admin Dashboard</title>
+    <title>Edit Marketplace: {data.marketplace?.platform_name || 'Loading...'} - Admin Dashboard</title>
 </svelte:head>
 
 <div class="py-6" in:fade>
@@ -38,7 +60,7 @@
         <div class="md:flex md:items-center md:justify-between">
             <div class="min-w-0 flex-1">
                 <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-                    Edit Marketplace: {data.marketplace.name}
+                    Edit Marketplace: {data.marketplace?.platform_name || 'Loading...'}
                 </h2>
             </div>
             <div class="mt-4 flex md:ml-4 md:mt-0">
@@ -69,61 +91,62 @@
                 >
                     <FormGroup legend="Marketplace Details">
                         <FormField
-                            label="Marketplace Name"
-                            name="name"
+                            label="Platform Name"
+                            name="platform_name"
                             type="text"
-                            bind:value={name}
+                            bind:value={platform_name}
                             required
-                            error={form?.fieldErrors?.name}
-                            placeholder="Enter marketplace name"
+                            error={form?.fieldErrors?.platform_name}
+                            placeholder="Enter platform name"
                         />
 
                         <FormField
-                            label="Website URL"
-                            name="url"
+                            label="Base URL"
+                            name="base_url"
                             type="url"
-                            bind:value={url}
+                            bind:value={base_url}
                             required
-                            error={form?.fieldErrors?.url}
+                            error={form?.fieldErrors?.base_url}
                             placeholder="https://example.com"
+                        />
+
+                        <FormField
+                            label="Currency Code"
+                            name="currency_code"
+                            type="text"
+                            bind:value={currency_code}
+                            required
+                            error={form?.fieldErrors?.currency_code}
+                            placeholder="USD"
+                            maxlength="3"
+                        />
+
+                        <FormField
+                            label="Country Code"
+                            name="country_code"
+                            type="text"
+                            bind:value={country_code}
+                            required
+                            error={form?.fieldErrors?.country_code}
+                            placeholder="US"
+                            maxlength="2"
+                        />
+
+                        <FormField
+                            label="External ID"
+                            name="external_id"
+                            type="text"
+                            bind:value={external_id}
+                            error={form?.fieldErrors?.external_id}
+                            placeholder="Optional external identifier"
                         />
                     </FormGroup>
 
-                    {#if data.marketplace.brands && data.marketplace.brands.length > 0}
-                        <FormGroup legend="Associated Brands">
-                            <div class="flex flex-wrap gap-2">
-                                {#each data.marketplace.brands as brand}
-                                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                        {brand.name}
-                                    </span>
-                                {/each}
-                            </div>
-                        </FormGroup>
-                    {/if}
-
-                    {#if form?.error}
-                        <div class="rounded-md bg-red-50 p-4">
-                            <div class="flex">
-                                <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">
-                                        {form.error}
-                                    </h3>
-                                </div>
-                            </div>
-                        </div>
-                    {/if}
-
-                    <div class="flex justify-end gap-x-3">
-                        <a
-                            href="/admin/marketplaces"
-                            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </a>
+                    <div class="flex justify-end">
                         <button
                             type="submit"
+                            class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
                             disabled={!isValid || loading}
-                            class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Saving...' : 'Save Changes'}
                         </button>

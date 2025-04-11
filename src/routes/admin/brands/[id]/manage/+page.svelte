@@ -60,7 +60,7 @@
     );
 
     $: availableMarketplaces = data.allMarketplaces.filter(marketplace => 
-        !data.brandMarketplaces.some(bm => bm.marketplace_id === marketplace.marketplace_id)
+        !data.brandMarketplaces.some(bm => bm.id === marketplace.id)
     );
 
     $: filteredMarketplaces = availableMarketplaces.filter(marketplace => 
@@ -72,7 +72,7 @@
         
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/users`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/users`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userIds: selectedUsers })
@@ -91,7 +91,7 @@
     const handleUserRemoval = async (userId: number) => {
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/users`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/users`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userIds: [userId] })
@@ -110,7 +110,7 @@
     const handleMarketplaceAssociation = async (marketplaceId: number) => {
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/marketplaces`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/marketplaces`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ marketplaceIds: [marketplaceId] })
@@ -118,7 +118,7 @@
             
             if (!response.ok) throw new Error('Failed to associate marketplace');
             
-            window.location.href = `/admin/brands/${data.brand.brand_id}/manage?tab=marketplaces`;
+            window.location.href = `/admin/brands/${data.brand.id}/manage?tab=marketplaces`;
         } catch (error) {
             console.error('Error:', error);
         } finally {
@@ -129,7 +129,7 @@
     const handleMarketplaceRemoval = async (marketplaceId: number) => {
         loading = true;
         try {
-            const response = await fetch(`/api/brands/${data.brand.brand_id}/marketplaces`, {
+            const response = await fetch(`/api/brands/${data.brand.id}/marketplaces`, {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ marketplaceIds: [marketplaceId] })
@@ -150,7 +150,7 @@
         try {
             const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
             const response = await fetch(
-                `/api/brands/${data.brand.brand_id}/marketplaces/${marketplaceId}/status`,
+                `/api/brands/${data.brand.id}/marketplaces/${marketplaceId}/status`,
                 {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -365,7 +365,7 @@
                             class="w-64"
                         />
                         <a
-                            href="/admin/brands/{data.brand.brand_id}/terms/new"
+                            href="/admin/brands/{data.brand.id}/terms/new"
                             class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                         >
                             Add New Term
@@ -389,7 +389,7 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                {#each filteredTerms as term (term.term_id)}
+                                {#each filteredTerms as term (term.id)}
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             {term.term}
@@ -399,7 +399,7 @@
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <a 
-                                                href="/admin/brands/{data.brand.brand_id}/terms/{term.term_id}/edit"
+                                                href="/admin/brands/{data.brand.id}/terms/{term.id}/edit"
                                                 class="text-blue-600 hover:text-blue-900"
                                             >
                                                 Edit
@@ -439,7 +439,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
-                                        {#each data.brandMarketplaces as marketplace (marketplace.marketplace_id)}
+                                        {#each data.brandMarketplaces as marketplace (marketplace.id)}
                                             <tr>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="text-sm font-medium text-gray-900">
@@ -455,7 +455,7 @@
                                                             type="button"
                                                             class="focus:outline-none"
                                                             disabled={loading}
-                                                            on:click={() => toggleMarketplaceStatus(marketplace.marketplace_id, marketplace.status)}
+                                                            on:click={() => toggleMarketplaceStatus(marketplace.id, marketplace.status)}
                                                         >
                                                             {marketplace.status}
                                                         </button>
@@ -469,7 +469,7 @@
                                                         type="button"
                                                         class="text-red-600 hover:text-red-900"
                                                         disabled={loading}
-                                                        on:click={() => handleMarketplaceRemoval(marketplace.marketplace_id)}
+                                                        on:click={() => handleMarketplaceRemoval(marketplace.id)}
                                                     >
                                                         Remove
                                                     </button>
@@ -510,7 +510,7 @@
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
-                                        {#each filteredMarketplaces as marketplace (marketplace.marketplace_id)}
+                                        {#each filteredMarketplaces as marketplace (marketplace.id)}
                                             <tr>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="text-sm font-medium text-gray-900">
@@ -525,7 +525,7 @@
                                                         type="button"
                                                         class="text-blue-600 hover:text-blue-900"
                                                         disabled={loading}
-                                                        on:click={() => handleMarketplaceAssociation(marketplace.marketplace_id)}
+                                                        on:click={() => handleMarketplaceAssociation(marketplace.id)}
                                                     >
                                                         Add
                                                     </button>

@@ -58,7 +58,7 @@
                 >
                     <option value="">Select a brand</option>
                     {#each brands as brand}
-                        <option value={brand.brand_id.toString()}>{brand.name}</option>
+                        <option value={brand.id.toString()}>{brand.name}</option>
                     {/each}
                 </select>
             </div>
