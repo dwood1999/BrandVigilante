@@ -2,6 +2,8 @@
     import { fade } from 'svelte/transition';
     import type { PageData } from '$lib/types';
     import { onMount } from 'svelte';
+    import Button from '$lib/components/ui/Button.svelte';
+    import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
     
     export let data: PageData;
 
@@ -41,81 +43,82 @@
     <meta name="description" content={meta.description} />
 </svelte:head>
 
-<main class="min-h-screen">
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-blue-600 to-indigo-800 text-white py-20">
-        <div class="container mx-auto px-4" in:fade="{{ duration: 1000 }}">
-            <div class="max-w-4xl mx-auto text-center">
-                <h1 class="text-5xl font-bold mb-6">Protect Your Intellectual Property with JanusIPM</h1>
-                <p class="text-xl mb-8">Advanced AI-powered solutions for comprehensive IP management and brand protection</p>
-                <div class="flex justify-center gap-4">
-                    <button class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-opacity-90 transition-all">
-                        Get Started
-                    </button>
-                    <button class="border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-all">
-                        Learn More
-                    </button>
+<ErrorBoundary>
+    <main class="min-h-screen">
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-r from-blue-600 to-indigo-800 text-white py-20">
+            <div class="container mx-auto px-4" in:fade={{ duration: 1000 }}>
+                <div class="max-w-4xl mx-auto text-center">
+                    <h1 class="text-5xl font-bold mb-6">Protect Your Intellectual Property with JanusIPM</h1>
+                    <p class="text-xl mb-8">Advanced AI-powered solutions for comprehensive IP management and brand protection</p>
+                    <div class="flex justify-center gap-4">
+                        <Button variant="primary" size="lg">
+                            Get Started
+                        </Button>
+                        <Button variant="outline" size="lg">
+                            Learn More
+                        </Button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Features Section -->
-    <section class="py-20 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Comprehensive IP Management Solutions</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                {#each features as feature}
-                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
-                        <div class="text-blue-600 mb-4">
-                            <!-- Icon placeholder - replace with actual icons -->
-                            <span class="text-2xl">⚡</span>
+        <!-- Features Section -->
+        <section class="py-20 bg-gray-50 dark:bg-gray-800">
+            <div class="container mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-12">Comprehensive IP Management Solutions</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {#each features as feature}
+                        <div class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg hover:shadow-xl transition-all">
+                            <div class="text-blue-600 dark:text-blue-400 mb-4">
+                                <span class="text-2xl">{feature.icon || '⚡'}</span>
+                            </div>
+                            <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
+                            <p class="text-gray-600 dark:text-gray-300">{feature.description}</p>
                         </div>
-                        <h3 class="text-xl font-semibold mb-2">{feature.title}</h3>
-                        <p class="text-gray-600">{feature.description}</p>
-                    </div>
-                {/each}
+                    {/each}
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Why Choose Us Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-4">
-            <div class="max-w-3xl mx-auto text-center">
-                <h2 class="text-3xl font-bold mb-12">Why Choose JanusIPM?</h2>
-                <div class="grid md:grid-cols-3 gap-8">
-                    <div class="text-center">
-                        <div class="text-4xl mb-4">🔍</div>
-                        <h3 class="text-xl font-semibold mb-2">AI-Powered Monitoring</h3>
-                        <p class="text-gray-600">24/7 automated surveillance of your intellectual property</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl mb-4">🛡️</div>
-                        <h3 class="text-xl font-semibold mb-2">Proactive Protection</h3>
-                        <p class="text-gray-600">Early detection and swift response to potential infringements</p>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl mb-4">📊</div>
-                        <h3 class="text-xl font-semibold mb-2">Advanced Analytics</h3>
-                        <p class="text-gray-600">Comprehensive insights and reporting tools</p>
+        <!-- Why Choose Us Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-4">
+                <div class="max-w-3xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-12">Why Choose JanusIPM?</h2>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🔍</div>
+                            <h3 class="text-xl font-semibold mb-2">AI-Powered Monitoring</h3>
+                            <p class="text-gray-600 dark:text-gray-300">24/7 automated surveillance of your intellectual property</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">🛡️</div>
+                            <h3 class="text-xl font-semibold mb-2">Proactive Protection</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Early detection and swift response to potential infringements</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">📊</div>
+                            <h3 class="text-xl font-semibold mb-2">Advanced Analytics</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Comprehensive insights and reporting tools</p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- CTA Section -->
-    <section class="bg-blue-600 text-white py-16">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-4">Ready to Protect Your Intellectual Property?</h2>
-            <p class="text-xl mb-8">Start securing your IP assets with our advanced management platform</p>
-            <button class="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-opacity-90 transition-all">
-                Schedule a Demo
-            </button>
-        </div>
-    </section>
-</main>
+        <!-- CTA Section -->
+        <section class="bg-blue-600 text-white py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl font-bold mb-4">Ready to Protect Your Intellectual Property?</h2>
+                <p class="text-xl mb-8">Start securing your IP assets with our advanced management platform</p>
+                <Button variant="primary" size="lg">
+                    Schedule a Demo
+                </Button>
+            </div>
+        </section>
+    </main>
+</ErrorBoundary>
 
 <style lang="postcss">
     :global(html) {

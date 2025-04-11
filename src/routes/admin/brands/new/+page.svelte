@@ -2,8 +2,25 @@
     import { enhance } from '$app/forms';
     import type { ActionData } from './$types';
     import { fade } from 'svelte/transition';
+    import FormField from '$lib/components/ui/FormField.svelte';
+    import FormContainer from '$lib/components/ui/FormContainer.svelte';
+    import FormGroup from '$lib/components/ui/FormGroup.svelte';
 
-    export let form: ActionData;
+    interface FormResult {
+        type: 'success' | 'failure';
+        data?: any;
+    }
+
+    interface FormErrors {
+        error?: string;
+        fieldErrors?: {
+            name?: string;
+            url?: string;
+            description?: string;
+        };
+    }
+
+    export let form: FormErrors;
     
     let loading = false;
     let name = '';
@@ -39,97 +56,76 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mt-8 bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <form
-                    method="POST"
-                    use:enhance={() => {
+                <FormContainer 
+                    onSubmit={() => {
                         loading = true;
-                        return async ({ result }) => {
+                        return async ({ result }: { result: FormResult }) => {
                             loading = false;
                             if (result.type === 'success') {
                                 window.location.href = '/admin/brands';
                             }
                         };
                     }}
+                    className="space-y-6"
                 >
-                    <div class="space-y-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium leading-6 text-gray-900">
-                                Brand Name *
-                            </label>
-                            <div class="mt-2">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    bind:value={name}
-                                    required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                    placeholder="Enter brand name"
-                                />
-                            </div>
-                        </div>
+                    <FormGroup legend="Brand Information">
+                        <FormField
+                            label="Brand Name"
+                            name="name"
+                            type="text"
+                            bind:value={name}
+                            required
+                            error={form?.fieldErrors?.name}
+                            placeholder="Enter brand name"
+                        />
 
-                        <div>
-                            <label for="url" class="block text-sm font-medium leading-6 text-gray-900">
-                                Website URL
-                            </label>
-                            <div class="mt-2">
-                                <input
-                                    type="url"
-                                    name="url"
-                                    id="url"
-                                    bind:value={url}
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                    placeholder="https://example.com"
-                                />
-                            </div>
-                        </div>
+                        <FormField
+                            label="Website URL"
+                            name="url"
+                            type="url"
+                            bind:value={url}
+                            error={form?.fieldErrors?.url}
+                            placeholder="https://example.com"
+                        />
 
-                        <div>
-                            <label for="description" class="block text-sm font-medium leading-6 text-gray-900">
-                                Description
-                            </label>
-                            <div class="mt-2">
-                                <textarea
-                                    name="description"
-                                    id="description"
-                                    bind:value={description}
-                                    rows="4"
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                    placeholder="Enter brand description"
-                                />
-                            </div>
-                        </div>
+                        <FormField
+                            label="Description"
+                            name="description"
+                            type="text"
+                            bind:value={description}
+                            error={form?.fieldErrors?.description}
+                            placeholder="Enter brand description"
+                        />
+                    </FormGroup>
 
-                        {#if form?.error}
-                            <div class="rounded-md bg-red-50 p-4">
-                                <div class="flex">
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">
-                                            {form.error}
-                                        </h3>
-                                    </div>
+                    {#if form?.error}
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        {form.error}
+                                    </h3>
                                 </div>
                             </div>
-                        {/if}
-
-                        <div class="flex justify-end gap-x-3">
-                            <a
-                                href="/admin/brands"
-                                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </a>
-                            <button
-                                type="submit"
-                                disabled={!isValid || loading}
-                                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Creating...' : 'Create Brand'}
-                            </button>
                         </div>
+                    {/if}
+
+                    <div class="flex justify-end gap-x-3">
+                        <a
+                            href="/admin/brands"
+                            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </a>
+                        <button
+                            type="submit"
+                            disabled={!isValid || loading}
+                            class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? 'Creating...' : 'Create Brand'}
+                        </button>
                     </div>
-                </form>
+                </FormContainer>
             </div>
         </div>
     </div>

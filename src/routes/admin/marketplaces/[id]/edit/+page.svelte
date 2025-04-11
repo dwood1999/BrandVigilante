@@ -1,10 +1,26 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import type { PageData, ActionData } from './$types';
+    import type { PageData } from './$types';
     import { fade } from 'svelte/transition';
+    import FormField from '$lib/components/ui/FormField.svelte';
+    import FormContainer from '$lib/components/ui/FormContainer.svelte';
+    import FormGroup from '$lib/components/ui/FormGroup.svelte';
+
+    interface FormResult {
+        type: 'success' | 'failure';
+        data?: any;
+    }
+
+    interface FormErrors {
+        error?: string;
+        fieldErrors?: {
+            name?: string;
+            url?: string;
+        };
+    }
 
     export let data: PageData;
-    export let form: ActionData;
+    export let form: FormErrors;
     
     let loading = false;
     let name = data.marketplace.name;
@@ -39,99 +55,80 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mt-8 bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <form
-                    method="POST"
-                    use:enhance={() => {
+                <FormContainer 
+                    onSubmit={() => {
                         loading = true;
-                        return async ({ result }) => {
+                        return async ({ result }: { result: FormResult }) => {
                             loading = false;
                             if (result.type === 'success') {
                                 window.location.href = '/admin/marketplaces';
                             }
                         };
                     }}
+                    className="space-y-6"
                 >
-                    <div class="space-y-6">
-                        <div>
-                            <label for="name" class="block text-sm font-medium leading-6 text-gray-900">
-                                Marketplace Name *
-                            </label>
-                            <div class="mt-2">
-                                <input
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    bind:value={name}
-                                    required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                    placeholder="Enter marketplace name"
-                                />
-                            </div>
-                        </div>
+                    <FormGroup legend="Marketplace Details">
+                        <FormField
+                            label="Marketplace Name"
+                            name="name"
+                            type="text"
+                            bind:value={name}
+                            required
+                            error={form?.fieldErrors?.name}
+                            placeholder="Enter marketplace name"
+                        />
 
-                        <div>
-                            <label for="url" class="block text-sm font-medium leading-6 text-gray-900">
-                                Website URL *
-                            </label>
-                            <div class="mt-2">
-                                <input
-                                    type="url"
-                                    name="url"
-                                    id="url"
-                                    bind:value={url}
-                                    required
-                                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                                    placeholder="https://example.com"
-                                />
-                            </div>
-                        </div>
+                        <FormField
+                            label="Website URL"
+                            name="url"
+                            type="url"
+                            bind:value={url}
+                            required
+                            error={form?.fieldErrors?.url}
+                            placeholder="https://example.com"
+                        />
+                    </FormGroup>
 
-                        {#if data.marketplace.brands && data.marketplace.brands.length > 0}
-                            <div>
-                                <label class="block text-sm font-medium leading-6 text-gray-900">
-                                    Associated Brands
-                                </label>
-                                <div class="mt-2">
-                                    <div class="flex flex-wrap gap-2">
-                                        {#each data.marketplace.brands as brand}
-                                            <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
-                                                {brand.name}
-                                            </span>
-                                        {/each}
-                                    </div>
+                    {#if data.marketplace.brands && data.marketplace.brands.length > 0}
+                        <FormGroup legend="Associated Brands">
+                            <div class="flex flex-wrap gap-2">
+                                {#each data.marketplace.brands as brand}
+                                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                                        {brand.name}
+                                    </span>
+                                {/each}
+                            </div>
+                        </FormGroup>
+                    {/if}
+
+                    {#if form?.error}
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        {form.error}
+                                    </h3>
                                 </div>
                             </div>
-                        {/if}
-
-                        {#if form?.error}
-                            <div class="rounded-md bg-red-50 p-4">
-                                <div class="flex">
-                                    <div class="ml-3">
-                                        <h3 class="text-sm font-medium text-red-800">
-                                            {form.error}
-                                        </h3>
-                                    </div>
-                                </div>
-                            </div>
-                        {/if}
-
-                        <div class="flex justify-end gap-x-3">
-                            <a
-                                href="/admin/marketplaces"
-                                class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            >
-                                Cancel
-                            </a>
-                            <button
-                                type="submit"
-                                disabled={!isValid || loading}
-                                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? 'Saving...' : 'Save Changes'}
-                            </button>
                         </div>
+                    {/if}
+
+                    <div class="flex justify-end gap-x-3">
+                        <a
+                            href="/admin/marketplaces"
+                            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                        >
+                            Cancel
+                        </a>
+                        <button
+                            type="submit"
+                            disabled={!isValid || loading}
+                            class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {loading ? 'Saving...' : 'Save Changes'}
+                        </button>
                     </div>
-                </form>
+                </FormContainer>
             </div>
         </div>
     </div>
