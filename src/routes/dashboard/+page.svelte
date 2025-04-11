@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -8,7 +9,10 @@
     let loading = true;
 
     onMount(() => {
-        loading = false;
+        // Set loading to false after a short delay to ensure the component is fully mounted
+        setTimeout(() => {
+            loading = false;
+        }, 100);
     });
 
     function formatDate(dateString: string): string {
@@ -40,17 +44,17 @@
     <title>Dashboard - JanusIPM</title>
 </svelte:head>
 
-{#if loading}
+{#if loading && browser}
     <div class="min-h-screen flex items-center justify-center">
         <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
     </div>
 {:else}
     <div class="min-h-screen bg-gray-100">
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8" in:fade>
+        <main class="max-w-7xl mx-auto py-4 sm:px-4 lg:px-6" in:fade>
             <!-- Welcome Section -->
-            <div class="px-4 py-6 sm:px-0">
-                <h1 class="text-2xl font-semibold text-gray-900">
+            <div class="px-2 py-4 sm:px-0">
+                <h1 class="text-xl font-semibold text-gray-900">
                     Welcome back, {data.user.first_name}!
                 </h1>
                 <p class="mt-1 text-sm text-gray-600">
@@ -60,34 +64,34 @@
 
             <!-- Quick Actions -->
             {#if data.user.role === 'admin'}
-                <div class="mt-6 px-4 sm:px-0">
-                    <div class="bg-white shadow rounded-lg p-6">
-                        <h2 class="text-lg font-medium text-gray-900 mb-4">Admin Actions</h2>
-                        <div class="flex flex-wrap gap-4">
+                <div class="mt-4 px-2 sm:px-0">
+                    <div class="bg-white shadow rounded-lg p-4">
+                        <h2 class="text-base font-medium text-gray-900 mb-3">Admin Actions</h2>
+                        <div class="flex flex-wrap gap-2">
                             <a
                                 href="/admin/users"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 data-sveltekit-preload
                             >
                                 User Management
                             </a>
                             <a
                                 href="/admin/brands"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 data-sveltekit-preload
                             >
                                 Brand Management
                             </a>
                             <a
                                 href="/admin/terms"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 data-sveltekit-preload
                             >
                                 Trademark Terms
                             </a>
                             <a
                                 href="/admin/marketplaces"
-                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                 data-sveltekit-preload
                             >
                                 Marketplace Management
@@ -98,16 +102,16 @@
             {/if}
 
             <!-- User Information -->
-            <div class="mt-6 bg-white shadow overflow-hidden sm:rounded-lg">
-                <div class="px-4 py-5 sm:px-6">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">
+            <div class="mt-4 bg-white shadow overflow-hidden sm:rounded-lg">
+                <div class="px-3 py-4 sm:px-4">
+                    <h3 class="text-base leading-6 font-medium text-gray-900">
                         Account Information
                     </h3>
                 </div>
                 <div class="border-t border-gray-200">
                     <dl>
                         <!-- Email field with verification status -->
-                        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-gray-50 px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">
                                 Email address
                             </dt>
@@ -115,7 +119,7 @@
                                 {data.user.email}
                                 {#if data.user.email_verified}
                                     <svg 
-                                        class="h-5 w-5 text-green-500" 
+                                        class="h-4 w-4 text-green-500" 
                                         xmlns="http://www.w3.org/2000/svg" 
                                         viewBox="0 0 20 20" 
                                         fill="currentColor"
@@ -130,7 +134,7 @@
                                 {:else}
                                     <span class="inline-flex items-center">
                                         <svg 
-                                            class="h-5 w-5 text-yellow-500" 
+                                            class="h-4 w-4 text-yellow-500" 
                                             xmlns="http://www.w3.org/2000/svg" 
                                             viewBox="0 0 20 20" 
                                             fill="currentColor"
@@ -160,7 +164,7 @@
                         </div>
 
                         <!-- Rest of the user information -->
-                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-white px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">
                                 Full name
                             </dt>
@@ -168,27 +172,27 @@
                                 {data.user.first_name} {data.user.last_name}
                             </dd>
                         </div>
-                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-white px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">Phone number</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                 {data.user.phone ? formatPhoneNumber(data.user.phone) : 'Not provided'}
                             </dd>
                         </div>
-                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-white px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">Account type</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {data.user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {data.user.role === 'admin' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800'}">
                                     {data.user.role}
                                 </span>
                             </dd>
                         </div>
-                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-white px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">Member since</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                 {formatDate(data.user.created_at)}
                             </dd>
                         </div>
-                        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <div class="bg-white px-3 py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-4">
                             <dt class="text-sm font-medium text-gray-500">Last login</dt>
                             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                                 {formatDateTime(data.user.lastLogin)}
