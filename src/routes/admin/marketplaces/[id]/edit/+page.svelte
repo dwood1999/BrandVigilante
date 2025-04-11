@@ -1,14 +1,18 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { page } from '$app/stores';
+    import { goto } from '$app/navigation';
     import type { PageData } from './$types';
     import { fade } from 'svelte/transition';
     import FormField from '$lib/components/ui/FormField.svelte';
     import FormContainer from '$lib/components/ui/FormContainer.svelte';
     import FormGroup from '$lib/components/ui/FormGroup.svelte';
+    import type { Marketplace } from '$lib/models/marketplace';
 
     interface FormResult {
-        type: 'success' | 'failure';
+        type: 'success' | 'failure' | 'redirect';
         data?: any;
+        location?: string;
     }
 
     interface FormErrors {
@@ -25,10 +29,12 @@
     export let data: PageData;
     export let form: FormErrors;
     
-    console.log('Page data:', data);
-    console.log('Marketplace data:', data.marketplace);
+    console.log('[DEBUG] Component mounted');
+    console.log('[DEBUG] Full page data:', JSON.stringify(data, null, 2));
+    console.log('[DEBUG] Marketplace data:', JSON.stringify(data.marketplace, null, 2));
     
     let loading = false;
+    let error: string | null = null;
     
     // Initialize form fields with marketplace data
     let platform_name = data.marketplace?.platform_name || '';
@@ -37,7 +43,7 @@
     let country_code = data.marketplace?.country_code || '';
     let external_id = data.marketplace?.external_id || '';
 
-    console.log('Form values:', {
+    console.log('[DEBUG] Initialized form values:', {
         platform_name,
         base_url,
         currency_code,
@@ -45,10 +51,39 @@
         external_id
     });
 
+    $: {
+        console.log('[DEBUG] Reactive statement triggered');
+        console.log('[DEBUG] Current form values:', {
+            platform_name,
+            base_url,
+            currency_code,
+            country_code,
+            external_id
+        });
+    }
+
     $: isValid = platform_name.trim().length > 0 && 
                  base_url.trim().length > 0 && 
                  currency_code.trim().length > 0 && 
                  country_code.trim().length > 0;
+
+    function handleSubmit() {
+        loading = true;
+        error = null;
+        
+        return async ({ result, update }) => {
+            loading = false;
+            
+            if (result.type === 'redirect') {
+                // Handle redirect response
+                window.location.href = result.location;
+            } else if (result.type === 'failure') {
+                // Handle error
+                error = result.data?.error || 'Failed to update marketplace';
+                await update();
+            }
+        };
+    }
 </script>
 
 <svelte:head>
@@ -77,17 +112,10 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mt-8 bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <FormContainer 
-                    onSubmit={() => {
-                        loading = true;
-                        return async ({ result }: { result: FormResult }) => {
-                            loading = false;
-                            if (result.type === 'success') {
-                                window.location.href = '/admin/marketplaces';
-                            }
-                        };
-                    }}
-                    className="space-y-6"
+                <form 
+                    method="POST"
+                    use:enhance={handleSubmit}
+                    class="space-y-6"
                 >
                     <FormGroup legend="Marketplace Details">
                         <FormField
@@ -151,7 +179,7 @@
                             {loading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
-                </FormContainer>
+                </form>
             </div>
         </div>
     </div>

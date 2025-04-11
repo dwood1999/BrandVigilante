@@ -69,7 +69,7 @@
 
 <div class="form-field">
   {#if label}
-    <label for={id} class="form-label">
+    <label for={fieldId} class="form-label">
       {label}
       {#if required}
         <span class="required">*</span>
@@ -79,7 +79,7 @@
   <div class="input-wrapper">
     {#if type === 'textarea'}
       <textarea
-        {id}
+        id={fieldId}
         {name}
         {placeholder}
         {required}
@@ -88,15 +88,16 @@
         class:error={!!error}
         class:success={!!success}
         class:disabled
-        on:input
+        bind:value
+        on:input={handleInput}
         on:change
-        on:blur
-        on:focus
+        on:blur={handleBlur}
+        on:focus={handleFocus}
         {...$$restProps}
       ></textarea>
     {:else}
       <input
-        {id}
+        id={fieldId}
         {name}
         {type}
         {placeholder}
@@ -106,10 +107,11 @@
         class:error={!!error}
         class:success={!!success}
         class:disabled
-        on:input
+        bind:value
+        on:input={handleInput}
         on:change
-        on:blur
-        on:focus
+        on:blur={handleBlur}
+        on:focus={handleFocus}
         {...$$restProps}
       />
     {/if}

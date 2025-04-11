@@ -41,13 +41,26 @@ export interface UpdateMarketplaceData {
 }
 
 const convertRowToMarketplace = (row: MarketplaceRow): Marketplace => {
-    console.log('Converting row to marketplace:', row);
+    console.log('[DEBUG] Converting row to marketplace. Raw row:', JSON.stringify(row, null, 2));
+    
+    if (!row) {
+        console.error('[DEBUG] No row data provided to convert');
+        throw new Error('No row data provided to convert');
+    }
+    
+    // Ensure all required fields are present
+    if (!row.platform_name || !row.base_url || !row.currency_code || !row.country_code) {
+        console.error('[DEBUG] Row data is incomplete:', row);
+        throw new Error('Row data is incomplete');
+    }
+    
     const marketplace = {
         ...row,
         created_at: new Date(row.created_at),
         updated_at: new Date(row.updated_at)
     };
-    console.log('Converted marketplace:', marketplace);
+    
+    console.log('[DEBUG] Converted marketplace:', JSON.stringify(marketplace, null, 2));
     return marketplace;
 };
 
@@ -60,46 +73,51 @@ export class MarketplaceModel {
     }
 
     static async findById(id: number): Promise<Marketplace | null> {
-        console.log('Finding marketplace by ID:', id);
+        console.log('[DEBUG] Finding marketplace by ID:', id);
         
-        // First, check if the table exists and has data
-        const [tables] = await pool.query<RowDataPacket[]>(
-            'SHOW TABLES LIKE "marketplaces"'
-        );
-        console.log('Tables:', tables);
-        
-        if (tables.length === 0) {
-            console.error('marketplaces table does not exist');
-            return null;
+        try {
+            // First, check if the table exists and has data
+            const [tables] = await pool.query<RowDataPacket[]>(
+                'SHOW TABLES LIKE "marketplaces"'
+            );
+            console.log('[DEBUG] Tables check result:', JSON.stringify(tables, null, 2));
+            
+            if (tables.length === 0) {
+                console.error('[DEBUG] marketplaces table does not exist');
+                return null;
+            }
+            
+            // Check the structure of the table
+            const [columns] = await pool.query<RowDataPacket[]>(
+                'SHOW COLUMNS FROM marketplaces'
+            );
+            console.log('[DEBUG] Table columns:', JSON.stringify(columns, null, 2));
+            
+            // Check if there are any records in the table
+            const [countResult] = await pool.query<RowDataPacket[]>(
+                'SELECT COUNT(*) as count FROM marketplaces'
+            );
+            console.log('[DEBUG] Total records:', countResult[0].count);
+            
+            // Now try to find the specific marketplace
+            const [rows] = await pool.query<MarketplaceRow[]>(
+                'SELECT * FROM marketplaces WHERE id = ?',
+                [id]
+            );
+            console.log('[DEBUG] Database rows:', JSON.stringify(rows, null, 2));
+            
+            if (rows.length === 0) {
+                console.log('[DEBUG] No marketplace found with ID:', id);
+                return null;
+            }
+            
+            const marketplace = convertRowToMarketplace(rows[0]);
+            console.log('[DEBUG] Found and converted marketplace:', JSON.stringify(marketplace, null, 2));
+            return marketplace;
+        } catch (error) {
+            console.error('[DEBUG] Error in findById:', error);
+            throw error;
         }
-        
-        // Check the structure of the table
-        const [columns] = await pool.query<RowDataPacket[]>(
-            'SHOW COLUMNS FROM marketplaces'
-        );
-        console.log('Table columns:', columns);
-        
-        // Check if there are any records in the table
-        const [countResult] = await pool.query<RowDataPacket[]>(
-            'SELECT COUNT(*) as count FROM marketplaces'
-        );
-        console.log('Total records:', countResult[0].count);
-        
-        // Now try to find the specific marketplace
-        const [rows] = await pool.query<MarketplaceRow[]>(
-            'SELECT * FROM marketplaces WHERE id = ?',
-            [id]
-        );
-        console.log('Database rows:', rows);
-        
-        if (rows.length === 0) {
-            console.log('No marketplace found with ID:', id);
-            return null;
-        }
-        
-        const marketplace = convertRowToMarketplace(rows[0]);
-        console.log('Found marketplace:', marketplace);
-        return marketplace;
     }
 
     static async findByExternalId(externalId: string): Promise<Marketplace | null> {

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { enhance } from '$app/forms';
     import { createEventDispatcher } from 'svelte';
     
     export let onSubmit: (event: SubmitEvent) => void;
@@ -19,6 +20,19 @@
     class="space-y-6 {className}"
     {novalidate}
     role="form"
+    method="POST"
+    use:enhance={({ formData, cancel }) => {
+        // You can modify formData here if needed
+        return async ({ result, update }) => {
+            // Call the onSubmit handler with the result
+            if (onSubmit) {
+                onSubmit({ type: result.type, data: result.data } as any);
+            }
+            
+            // Update the form with the result
+            await update();
+        };
+    }}
 >
     <slot />
 </form> 
