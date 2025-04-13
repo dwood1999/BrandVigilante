@@ -15,6 +15,10 @@
             term.brand_name?.toLowerCase().includes(searchQuery.toLowerCase())
         );
     }
+
+    function confirmDelete(event: MouseEvent) {
+        return confirm('Are you sure you want to delete this term?');
+    }
 </script>
 
 <svelte:head>
@@ -80,33 +84,28 @@
                                     {term.brand_name}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end space-x-2">
-                                        {#if term.id}
-                                            <a
-                                                href="/admin/terms/{term.id}/edit"
-                                                class="text-blue-600 hover:text-blue-900"
-                                            >
-                                                Edit
-                                            </a>
-                                        {:else}
-                                            <span class="text-gray-400">Edit</span>
-                                        {/if}
+                                    <div class="ml-2 flex flex-shrink-0">
+                                        <a
+                                            href="/admin/terms/{term.id}/edit"
+                                            class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mr-2"
+                                        >
+                                            Edit
+                                        </a>
                                         <form
                                             action="?/deleteTerm"
                                             method="POST"
-                                            class="inline"
                                             use:enhance={() => {
                                                 return async () => {
-                                                    const confirmed = confirm('Are you sure you want to delete this term?');
-                                                    return confirmed;
+                                                    if (!confirm('Are you sure you want to delete this term?')) {
+                                                        return false;
+                                                    }
                                                 };
                                             }}
                                         >
-                                            <input type="hidden" name="termId" value={term.id || ''}>
+                                            <input type="hidden" name="termId" value={term.id}>
                                             <button
                                                 type="submit"
-                                                class="text-red-600 hover:text-red-900"
-                                                disabled={!term.id}
+                                                class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-700 shadow-sm ring-1 ring-inset ring-red-600/10 hover:bg-red-100"
                                             >
                                                 Delete
                                             </button>

@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade } from 'svelte/transition';
     import { page } from '$app/stores';
+    import { enhance } from '$app/forms';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -30,20 +31,6 @@
         params.set('perPage', perPage.toString());
         params.set('page', '1');
         window.location.search = params.toString();
-    }
-
-    async function handleDelete(userId: number) {
-        if (!confirm('Are you sure you want to delete this user?')) return;
-
-        const response = await fetch(`/api/users/${userId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            alert('Failed to delete user');
-        }
     }
 </script>
 
@@ -137,19 +124,32 @@
                                         {formatDate(user.created_at)}
                                     </td>
                                     <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                                        <div class="flex gap-4 justify-end">
+                                        <div class="ml-2 flex flex-shrink-0">
                                             <a
                                                 href="/admin/users/edit/{user.id}"
-                                                class="text-blue-600 hover:text-blue-900"
+                                                class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mr-2"
                                             >
                                                 Edit
                                             </a>
-                                            <button
-                                                on:click={() => handleDelete(user.id)}
-                                                class="text-red-600 hover:text-red-900"
+                                            <form
+                                                action="?/deleteUser"
+                                                method="POST"
+                                                use:enhance={({ formData }) => {
+                                                    return async ({ result }) => {
+                                                        if (!confirm('Are you sure you want to delete this user?')) {
+                                                            return;
+                                                        }
+                                                    };
+                                                }}
                                             >
-                                                Delete
-                                            </button>
+                                                <input type="hidden" name="userId" value={user.id}>
+                                                <button
+                                                    type="submit"
+                                                    class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-700 shadow-sm ring-1 ring-inset ring-red-600/10 hover:bg-red-100"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

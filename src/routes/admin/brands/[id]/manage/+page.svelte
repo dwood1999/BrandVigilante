@@ -398,12 +398,33 @@
                                             {new Date(term.created_at).toLocaleDateString()}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a 
-                                                href="/admin/brands/{data.brand.id}/terms/{term.id}/edit"
-                                                class="text-blue-600 hover:text-blue-900"
-                                            >
-                                                Edit
-                                            </a>
+                                            <div class="ml-2 flex flex-shrink-0">
+                                                <a
+                                                    href="/admin/brands/{data.brand.id}/terms/{term.id}/edit"
+                                                    class="inline-flex items-center rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 mr-2"
+                                                >
+                                                    Edit
+                                                </a>
+                                                <form
+                                                    action="?/deleteTerm"
+                                                    method="POST"
+                                                    use:enhance={() => {
+                                                        return async () => {
+                                                            if (!confirm('Are you sure you want to delete this term?')) {
+                                                                return false;
+                                                            }
+                                                        };
+                                                    }}
+                                                >
+                                                    <input type="hidden" name="termId" value={term.id}>
+                                                    <button
+                                                        type="submit"
+                                                        class="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-sm font-semibold text-red-700 shadow-sm ring-1 ring-inset ring-red-600/10 hover:bg-red-100"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {/each}
