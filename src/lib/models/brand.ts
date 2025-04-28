@@ -11,10 +11,12 @@ interface BrandRow extends RowDataPacket {
     status: 'active' | 'inactive';
     created_at: string;
     updated_at: string | null;
+    trademark_term_ids: string | null;
+    trademark_terms: string | null;
 }
 
 interface BrandMarketplaceRow extends RowDataPacket {
-    id: number;
+    marketplace_id: number;
     name: string;
     url: string;
 }
@@ -68,56 +70,68 @@ export interface UpdateBrandData {
     status?: 'active' | 'inactive';
 }
 
+function convertRowToBrand(row: BrandRow): Brand {
+    const trademark_terms = row.trademark_term_ids && row.trademark_terms
+        ? row.trademark_term_ids.split(',').map((id: string, index: number) => {
+            const terms = row.trademark_terms?.split(',') || [];
+            return {
+                id: parseInt(id),
+                brand_id: row.id,
+                term: terms[index] || '',
+                created_at: new Date().toISOString()
+            };
+        })
+        : [];
+
+    return {
+        ...row,
+        marketplaces: [],
+        trademark_terms
+    };
+}
+
 export class BrandModel {
     static async findAll(): Promise<Brand[]> {
         const [rows] = await pool.query<BrandRow[]>(
-            'SELECT * FROM brands ORDER BY name'
+            `SELECT b.*, 
+                    GROUP_CONCAT(DISTINCT bt.id) as trademark_term_ids,
+                    GROUP_CONCAT(DISTINCT bt.term) as trademark_terms
+             FROM brands b
+             LEFT JOIN brand_tmterms bt ON b.id = bt.brand_id
+             GROUP BY b.id`
         );
-        return rows.map((row: BrandRow): Brand => ({
-            ...row,
-            marketplaces: [],
-            trademark_terms: []
-        }));
+        return rows.map(convertRowToBrand);
     }
 
     static async findById(id: number): Promise<Brand | null> {
         const [rows] = await pool.query<BrandRow[]>(
-            'SELECT * FROM brands WHERE id = ?',
-            [id]
+            `SELECT b.*, 
+                    GROUP_CONCAT(DISTINCT bt.id) as trademark_term_ids,
+                    GROUP_CONCAT(DISTINCT bt.term) as trademark_terms
+             FROM brands b
+             LEFT JOIN brand_tmterms bt ON b.id = bt.brand_id
+             WHERE b.id = ?`,
+            [id] as [number]
         );
-        if (rows.length === 0) return null;
-
-        const brand: Brand = {
-            ...rows[0],
-            marketplaces: [],
-            trademark_terms: []
-        };
-
-        // Get trademark terms
-        const [terms] = await pool.query<BrandTermRow[]>(
-            'SELECT id, brand_id, term, created_at FROM brand_tmterms WHERE brand_id = ? ORDER BY term',
-            [id]
-        );
-
-        // Get marketplaces
-        const marketplaces = await this.getMarketplaces(id);
-        brand.marketplaces = marketplaces;
-        brand.trademark_terms = terms;
-
-        return brand;
+        return rows.length ? convertRowToBrand(rows[0]) : null;
     }
 
     static async findByUserId(userId: number): Promise<Brand[]> {
         try {
             const [brands] = await pool.query<BrandRow[]>(
-                `SELECT b.* 
+                `SELECT b.*, 
+                        GROUP_CONCAT(DISTINCT bt.id) as trademark_term_ids,
+                        GROUP_CONCAT(DISTINCT bt.term) as trademark_terms
                  FROM brands b 
                  JOIN brands_user bu ON b.id = bu.brand_id 
+                 LEFT JOIN brand_tmterms bt ON b.id = bt.brand_id
                  WHERE bu.user_id = ? 
+                 GROUP BY b.id
                  ORDER BY b.name`,
-                [userId]
+                [userId] as [number]
             );
-            return brands;
+            
+            return brands.map(convertRowToBrand);
         } catch (error) {
             logger.error('Error in BrandModel.findByUserId:', error);
             throw error;
@@ -127,7 +141,7 @@ export class BrandModel {
     static async create(data: CreateBrandData): Promise<Brand> {
         const [result] = await pool.query<ResultSetHeader>(
             'INSERT INTO brands (name, display_name, url, description, status) VALUES (?, ?, ?, ?, ?)',
-            [data.name, data.display_name, data.url || null, data.description || null, data.status || 'active']
+            [data.name, data.display_name, data.url, data.description, data.status || 'active'] as [string, string, string | null, string | null, string]
         );
         const brand = await this.findById(result.insertId);
         if (!brand) throw new Error('Failed to create brand');
@@ -135,36 +149,9 @@ export class BrandModel {
     }
 
     static async update(id: number, data: UpdateBrandData): Promise<Brand | null> {
-        const updates: string[] = [];
-        const values: (string | null | number)[] = [];
-
-        if (data.name !== undefined) {
-            updates.push('name = ?');
-            values.push(data.name);
-        }
-        if (data.display_name !== undefined) {
-            updates.push('display_name = ?');
-            values.push(data.display_name);
-        }
-        if (data.url !== undefined) {
-            updates.push('url = ?');
-            values.push(data.url);
-        }
-        if (data.description !== undefined) {
-            updates.push('description = ?');
-            values.push(data.description);
-        }
-        if (data.status !== undefined) {
-            updates.push('status = ?');
-            values.push(data.status);
-        }
-
-        if (updates.length === 0) return this.findById(id);
-
-        values.push(id);
         await pool.query(
-            `UPDATE brands SET ${updates.join(', ')} WHERE id = ?`,
-            values
+            'UPDATE brands SET name = ?, display_name = ?, url = ?, description = ?, status = ? WHERE id = ?',
+            [data.name, data.display_name, data.url, data.description, data.status, id] as [string, string, string | null, string | null, string, number]
         );
         return this.findById(id);
     }
@@ -172,7 +159,7 @@ export class BrandModel {
     static async delete(id: number): Promise<boolean> {
         const [result] = await pool.query<ResultSetHeader>(
             'DELETE FROM brands WHERE id = ?',
-            [id]
+            [id] as [number]
         );
         return result.affectedRows > 0;
     }
@@ -181,7 +168,7 @@ export class BrandModel {
         try {
             await pool.query(
                 'INSERT INTO brands_user (brand_id, user_id) VALUES (?, ?)',
-                [brandId, userId]
+                [brandId, userId] as [number, number]
             );
         } catch (error) {
             logger.error('Error in BrandModel.addUser:', error);
@@ -193,7 +180,7 @@ export class BrandModel {
         try {
             await pool.query(
                 'DELETE FROM brands_user WHERE brand_id = ? AND user_id = ?',
-                [brandId, userId]
+                [brandId, userId] as [number, number]
             );
         } catch (error) {
             logger.error('Error in BrandModel.removeUser:', error);
@@ -216,30 +203,25 @@ export class BrandModel {
     static async addMarketplace(brandId: number, marketplaceId: number): Promise<void> {
         await pool.query(
             'INSERT INTO brand_marketplaces (brand_id, marketplace_id) VALUES (?, ?)',
-            [brandId, marketplaceId]
+            [brandId, marketplaceId] as [number, number]
         );
     }
 
     static async removeMarketplace(brandId: number, marketplaceId: number): Promise<void> {
         await pool.query(
             'DELETE FROM brand_marketplaces WHERE brand_id = ? AND marketplace_id = ?',
-            [brandId, marketplaceId]
+            [brandId, marketplaceId] as [number, number]
         );
     }
 
     static async getMarketplaces(brandId: number): Promise<BrandMarketplace[]> {
         const [rows] = await pool.query<BrandMarketplaceRow[]>(
-            `SELECT m.id as marketplace_id, m.name, m.url
+            `SELECT m.id as marketplace_id, m.platform_name as name, m.base_url as url
              FROM marketplaces m
              JOIN brand_marketplaces bm ON m.id = bm.marketplace_id
-             WHERE bm.brand_id = ?
-             ORDER BY m.name`,
-            [brandId]
+             WHERE bm.brand_id = ?`,
+            [brandId] as [number]
         );
-        return rows.map((row: BrandMarketplaceRow): BrandMarketplace => ({
-            marketplace_id: row.id,
-            name: row.name,
-            url: row.url
-        }));
+        return rows;
     }
 } 

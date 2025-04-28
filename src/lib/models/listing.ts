@@ -2,14 +2,26 @@ import { pool } from '$lib/db';
 import type { RowDataPacket, ResultSetHeader } from 'mysql2';
 import { logger } from '$lib/logger';
 
-interface ListingRow extends RowDataPacket {
+export interface ListingRow extends RowDataPacket {
     id: number;
-    url: string | null;
     product_id: number;
     marketplace_id: number;
-    external_id: string | null;
+    price: number;
+    currency: string;
+    url: string;
     created_at: string;
     updated_at: string;
+    // Product fields
+    product_title: string;
+    product_upc: string;
+    product_ean: string;
+    // Marketplace fields
+    marketplace_name: string;
+    marketplace_country: string;
+    seller_id: number;
+    seller_name: string;
+    seller_url: string;
+    is_buybox_winner: boolean;
 }
 
 interface BrandTmtermRow extends RowDataPacket {
@@ -67,7 +79,103 @@ export interface UpdateListingData {
     brand_tmterm_ids?: number[];
 }
 
+export interface PaginatedListings {
+    listings: ListingRow[];
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
+}
+
+export interface ListParams {
+    page: number;
+    perPage: number;
+    search?: string;
+    marketplace_id?: number;
+    product_id?: number;
+}
+
 export class ListingModel {
+    static async list(params: ListParams): Promise<PaginatedListings> {
+        const offset = (params.page - 1) * params.perPage;
+        const whereConditions: string[] = [];
+        const queryParams: any[] = [];
+
+        if (params.search) {
+            whereConditions.push('(p.title LIKE ? OR p.upc LIKE ? OR p.ean LIKE ?)');
+            queryParams.push(`%${params.search}%`, `%${params.search}%`, `%${params.search}%`);
+        }
+
+        if (params.marketplace_id) {
+            whereConditions.push('l.marketplace_id = ?');
+            queryParams.push(params.marketplace_id);
+        }
+
+        if (params.product_id) {
+            whereConditions.push('l.product_id = ?');
+            queryParams.push(params.product_id);
+        }
+
+        const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : '';
+
+        const [rows] = await pool.query<ListingRow[]>(
+            `SELECT l.*, 
+                    p.title as product_title, p.upc as product_upc, p.ean as product_ean,
+                    m.platform_name as marketplace_name, m.country_code as marketplace_country,
+                    s.id as seller_id, s.seller_name, s.seller_url,
+                    sl.is_buybox_winner
+             FROM listings l
+             JOIN products p ON l.product_id = p.id
+             JOIN marketplaces m ON l.marketplace_id = m.id
+             LEFT JOIN seller_listings sl ON l.id = sl.listing_id
+             LEFT JOIN sellers s ON sl.seller_id = s.id
+             ${whereClause}
+             ORDER BY l.created_at DESC
+             LIMIT ? OFFSET ?`,
+            [...queryParams, params.perPage, offset]
+        );
+
+        const [countResult] = await pool.query<RowDataPacket[]>(
+            `SELECT COUNT(*) as total
+             FROM listings l
+             JOIN products p ON l.product_id = p.id
+             JOIN marketplaces m ON l.marketplace_id = m.id
+             LEFT JOIN seller_listings sl ON l.id = sl.listing_id
+             LEFT JOIN sellers s ON sl.seller_id = s.id
+             ${whereClause}`,
+            queryParams
+        );
+
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / params.perPage);
+
+        return {
+            listings: rows,
+            total,
+            page: params.page,
+            perPage: params.perPage,
+            totalPages
+        };
+    }
+
+    static async findById(id: number): Promise<ListingRow | null> {
+        const [rows] = await pool.query<ListingRow[]>(
+            `SELECT 
+                l.*,
+                p.title as product_title,
+                p.upc as product_upc,
+                p.ean as product_ean,
+                m.platform_name as marketplace_name,
+                m.country_code as marketplace_country
+             FROM listings l
+             JOIN products p ON l.product_id = p.id
+             JOIN marketplaces m ON l.marketplace_id = m.id
+             WHERE l.id = ?`,
+            [id]
+        );
+        return rows[0] || null;
+    }
+
     static async findAll(): Promise<Listing[]> {
         try {
             const [listings] = await pool.query<ListingRow[]>(
@@ -98,40 +206,6 @@ export class ListingModel {
             return listingsWithTerms;
         } catch (error: any) {
             logger.error('Error in ListingModel.findAll:', { error: error.message });
-            throw error;
-        }
-    }
-
-    static async findById(id: number): Promise<Listing | null> {
-        try {
-            const [listings] = await pool.query<ListingRow[]>(
-                `SELECT l.*, m.id, m.currency_code, m.platform_name, m.country_code, m.external_id, m.base_url, m.created_at, m.updated_at,
-                        p.id as product_id, p.title, p.upc, p.ean, p.created_at as product_created_at, p.updated_at as product_updated_at,
-                        s.id as seller_id, s.external_seller_id, s.seller_name, s.seller_url, s.created_at as seller_created_at, s.updated_at as seller_updated_at
-                 FROM listings l 
-                 JOIN marketplaces m ON l.marketplace_id = m.id 
-                 JOIN products p ON l.product_id = p.id
-                 LEFT JOIN sellers s ON l.seller_id = s.id
-                 WHERE l.id = ?`,
-                [id]
-            );
-            
-            if (listings.length === 0) return null;
-            
-            const listing = listings[0];
-            
-            // Fetch brand trademark terms for the listing
-            const [terms] = await pool.query<BrandTmtermRow[]>(
-                `SELECT bt.id, bt.brand_id, bt.term, bt.created_at
-                 FROM brand_tmterms bt
-                 JOIN listing_brand_tmterms lbt ON bt.id = lbt.brand_tmterm_id
-                 WHERE lbt.listing_id = ?`,
-                [id]
-            );
-            
-            return { ...listing, brand_tmterms: terms };
-        } catch (error: any) {
-            logger.error('Error in ListingModel.findById:', { error: error.message });
             throw error;
         }
     }

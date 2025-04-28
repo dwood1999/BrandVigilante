@@ -8,7 +8,22 @@ export interface PageData {
     meta: {
         title: string;
         description: string;
+        severity?: number;
     };
+    databaseStatus: 'working' | 'failed';
+    users: Array<{
+        id: string;
+        email: string;
+        role: string;
+    }>;
+    userMessage: string;
+    user?: {
+        id: number;
+        email: string;
+        role: string;
+        first_name: string;
+        last_name: string;
+    } | null;
 }
 
 export interface Brand {

@@ -13,6 +13,10 @@ const config = {
 		adapter: adapter(),
 		csrf: {
 			checkOrigin: false // Disable CSRF checks completely for development
+		},
+		alias: {
+			$lib: './src/lib',
+			'$lib/*': './src/lib/*'
 		}
 	}
 };
