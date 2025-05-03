@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import argon2 from 'argon2';
-import { dev } from '$app/environment';
+import bcrypt from 'bcryptjs';
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
@@ -8,6 +7,12 @@ const MAX_ATTEMPTS = 5;
 
 // Track login attempts
 const loginAttempts = new Map<string, { count: number; timestamp: number }>();
+
+// Password hashing function
+export async function hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
+}
 
 // Rate limiting function
 export function checkRateLimit(identifier: string): boolean {
@@ -47,7 +52,22 @@ export const SignUpSchema = z.object({
         .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
         .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
         .regex(/[0-9]/, 'Password must contain at least one number')
-        .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+        // Make special character optional
+        .refine(
+            (val) => {
+                // Check if password meets at least 3 of the 4 requirements
+                const hasUpperCase = /[A-Z]/.test(val);
+                const hasLowerCase = /[a-z]/.test(val);
+                const hasNumber = /[0-9]/.test(val);
+                const hasSpecialChar = /[^A-Za-z0-9]/.test(val);
+                
+                const requirementsMet = [hasUpperCase, hasLowerCase, hasNumber, hasSpecialChar].filter(Boolean).length;
+                return requirementsMet >= 3;
+            },
+            {
+                message: 'Password must meet at least 3 of these requirements: uppercase letter, lowercase letter, number, or special character'
+            }
+        ),
 });
 
 export const SignInSchema = z.object({
@@ -58,31 +78,6 @@ export const SignInSchema = z.object({
     password: z.string()
         .min(1, 'Password is required'),
 });
-
-// Password hashing configuration
-const hashingConfig = {
-    memoryCost: 2 ** 16,
-    timeCost: 3,
-    parallelism: 1,
-    type: argon2.argon2id
-};
-
-// Password functions
-export const hashPassword = async (password: string): Promise<string> => {
-    return await argon2.hash(password, hashingConfig);
-};
-
-export const verifyPassword = async (hash: string, password: string): Promise<boolean> => {
-    if (!hash?.trim() || !password?.trim()) {
-        return false;
-    }
-    try {
-        return await argon2.verify(hash, password, hashingConfig);
-    } catch (error) {
-        console.error('Password verification error:', error);
-        return false;
-    }
-};
 
 // Add CSRF protection
 export const csrfConfig = {

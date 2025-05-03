@@ -14,8 +14,8 @@
     interface FormErrors {
         error?: string;
         fieldErrors?: {
-            firstName?: string;
-            lastName?: string;
+            first_name?: string;
+            last_name?: string;
             email?: string;
             password?: string;
             phone?: string;
@@ -27,19 +27,37 @@
     export let form: FormErrors | null = null;
     
     let loading = false;
-    let firstName = data.user.first_name;
-    let lastName = data.user.last_name;
+    let success = false;
+    let first_name = data.user.first_name;
+    let last_name = data.user.last_name;
     let email = data.user.email;
     let phone = data.user.phone || '';
     let password = '';
     let role = data.user.role;
 
+    // Function to update form values from data
+    function updateFormValues(userData: any) {
+        first_name = userData.first_name;
+        last_name = userData.last_name;
+        email = userData.email;
+        phone = userData.phone || '';
+        role = userData.role;
+        password = ''; // Always clear password after update
+    }
+
+    // Initialize form values
+    updateFormValues(data.user);
+
     const handleSubmit = () => {
         loading = true;
+        success = false;
         return async ({ result }: { result: FormResult }) => {
             loading = false;
             if (result.type === 'success') {
-                window.location.href = '/admin/users';
+                success = true;
+                if (result.data?.user) {
+                    updateFormValues(result.data.user);
+                }
             }
         };
     };
@@ -71,6 +89,23 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mt-8 bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
+                {#if success}
+                    <div class="rounded-md bg-green-50 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-green-800">
+                                    User updated successfully!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+
                 <FormContainer 
                     onSubmit={handleSubmit}
                     className="space-y-6"
@@ -79,20 +114,20 @@
                         <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
                             <FormField
                                 label="First Name"
-                                name="firstName"
+                                name="first_name"
                                 type="text"
-                                bind:value={firstName}
+                                bind:value={first_name}
                                 required
-                                error={form?.fieldErrors?.firstName}
+                                error={form?.fieldErrors?.first_name}
                             />
 
                             <FormField
                                 label="Last Name"
-                                name="lastName"
+                                name="last_name"
                                 type="text"
-                                bind:value={lastName}
+                                bind:value={last_name}
                                 required
-                                error={form?.fieldErrors?.lastName}
+                                error={form?.fieldErrors?.last_name}
                             />
                         </div>
 

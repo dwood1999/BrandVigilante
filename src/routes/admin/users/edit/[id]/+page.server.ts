@@ -9,7 +9,10 @@ const UpdateUserSchema = z.object({
     first_name: z.string().min(1, 'First name is required'),
     last_name: z.string().min(1, 'Last name is required'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(8, 'Password must be at least 8 characters').optional(),
+    password: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .optional()
+        .or(z.literal('')),
     phone: z.string()
         .min(10, 'Phone number is required')
         .transform(val => val.replace(/\D/g, '')),
@@ -66,7 +69,24 @@ export const actions: Actions = {
             }
 
             await UserModel.update(userId, updateData);
-            return { success: true };
+            
+            // Fetch the updated user data
+            const updatedUser = await UserModel.findById(userId);
+            if (!updatedUser) {
+                throw error(404, 'User not found after update');
+            }
+
+            return {
+                success: true,
+                user: {
+                    id: updatedUser.id,
+                    first_name: updatedUser.first_name,
+                    last_name: updatedUser.last_name,
+                    email: updatedUser.email,
+                    phone: updatedUser.phone,
+                    role: updatedUser.role
+                }
+            };
 
         } catch (error) {
             console.error('Error updating user:', error);
