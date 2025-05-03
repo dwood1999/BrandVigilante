@@ -5,6 +5,7 @@
     import FormField from '$lib/components/ui/FormField.svelte';
     import FormContainer from '$lib/components/ui/FormContainer.svelte';
     import FormGroup from '$lib/components/ui/FormGroup.svelte';
+    import { page } from '$app/stores'; // Import page store
 
     interface FormResult {
         type: 'success' | 'failure';
@@ -24,7 +25,7 @@
     }
 
     export let data: PageData;
-    export let form: FormErrors | null = null;
+    export let form: ActionData | null = null; 
     
     let loading = false;
     let success = false;
@@ -43,6 +44,7 @@
         phone = userData.phone || '';
         role = userData.role;
         password = ''; // Always clear password after update
+        console.log('[updateFormValues] Form values updated');
     }
 
     // Initialize form values
@@ -51,16 +53,26 @@
     const handleSubmit = () => {
         loading = true;
         success = false;
+        // No need to manually update form values here, 
+        // we'll rely on the reactive $page.form update below
         return async ({ result }: { result: FormResult }) => {
             loading = false;
-            if (result.type === 'success') {
-                success = true;
-                if (result.data?.user) {
-                    updateFormValues(result.data.user);
-                }
-            }
+            // Set success flag based on result, but don't update values here
+            success = result.type === 'success' && result.data?.success === true;
         };
     };
+
+    // Reactively update form values when $page.form indicates success
+    $: if ($page.form?.success && $page.form?.user) {
+        console.log('[Reactive Update] Form prop indicates success, updating values:', $page.form.user);
+        updateFormValues($page.form.user);
+        // Reset success flag from form prop if needed, or rely on local success flag
+        // Optionally clear $page.form after processing?
+    }
+
+    // Also update local success flag based on form prop
+    $: success = $page.form?.success === true;
+
 </script>
 
 <svelte:head>

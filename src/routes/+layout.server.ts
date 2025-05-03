@@ -1,8 +1,9 @@
 import type { LayoutServerLoad } from './$types';
 import { UserModel } from '$lib/models/user';
+import { sessionConfig } from '$lib/server/auth';
 
 export const load: LayoutServerLoad = async ({ cookies }) => {
-    const userId = cookies.get('userId');
+    const userId = cookies.get(sessionConfig.cookieName);
     
     if (!userId) {
         return {
@@ -13,7 +14,7 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
     try {
         const user = await UserModel.findById(parseInt(userId));
         if (!user) {
-            cookies.delete('userId', { path: '/' });
+            cookies.delete(sessionConfig.cookieName, { path: '/' });
             return {
                 user: null
             };
@@ -24,7 +25,8 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
                 id: user.id,
                 email: user.email,
                 role: user.role,
-                initials: user.email[0].toUpperCase()
+                first_name: user.first_name,
+                last_name: user.last_name
             }
         };
     } catch (error) {

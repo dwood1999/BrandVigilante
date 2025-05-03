@@ -19,7 +19,6 @@
     on:submit={handleSubmit}
     class="space-y-6 {className}"
     {novalidate}
-    role="form"
     method="POST"
     use:enhance={({ formData, cancel }) => {
         // You can modify formData here if needed

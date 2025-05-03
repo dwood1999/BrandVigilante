@@ -49,7 +49,7 @@ export async function withTransaction<T>(
 // Query helper with proper error handling
 export async function executeQuery<T extends RowDataPacket[] | ResultSetHeader>(
     query: string,
-    params?: any[]
+    params?: (string | number | boolean | null)[]
 ): Promise<T> {
     try {
         const [results] = await pool.execute(query, params);
@@ -95,7 +95,7 @@ export async function checkPoolHealth(): Promise<{
 // Query timeout helper
 export async function executeQueryWithTimeout<T extends RowDataPacket[] | ResultSetHeader>(
     query: string,
-    params: any[],
+    params: (string | number | boolean | null)[],
     timeoutMs: number = 5000
 ): Promise<T> {
     const timeoutPromise = new Promise((_, reject) => {

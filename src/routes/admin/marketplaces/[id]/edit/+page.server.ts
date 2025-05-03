@@ -22,7 +22,7 @@ export const load = (async ({ params, locals }): Promise<PageData> => {
     const user = locals.user;
 
     if (!user || user.role !== 'admin') {
-        throw redirect(302, '/login');
+        throw redirect(302, '/sign-in');
     }
 
     if (!id) {

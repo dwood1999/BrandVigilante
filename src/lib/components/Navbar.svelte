@@ -88,8 +88,8 @@
         userMenuOpen = false;
     }
 
-    // Navigation items
-    const navItems = [
+    // Make navItems reactive to user changes
+    $: navItems = [
         { href: '/', label: 'Home' },
         { href: '/about', label: 'About' },
         { href: '/contact', label: 'Contact' },
@@ -139,7 +139,7 @@
             <div class="hidden sm:ml-6 sm:flex sm:items-center">
                 {#if user}
                     <div class="flex items-center space-x-4">
-                        <!-- User Dropdown -->
+                        <!-- User Dropdown (Only this when logged in) -->
                         <div class="ml-3 relative user-menu">
                             <button
                                 type="button"
@@ -170,41 +170,26 @@
                                     >
                                         Your Profile
                                     </a>
-                                    <a
-                                        href="/settings"
-                                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-                                        role="menuitem"
-                                    >
-                                        Settings
-                                    </a>
+                                    <form action="/sign-out" method="POST" use:enhance={() => { /* Client-side redirect handled in enhance */ return async ({ result }) => { if (result.type === 'success') { closeMenus(); clearSessionCookieClientSide(); await goto('/', { invalidateAll: true }); } }; }}>
+                                        <button
+                                            type="submit"
+                                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            role="menuitem"
+                                        >
+                                            Sign out
+                                        </button>
+                                    </form>
                                 </div>
                             {/if}
                         </div>
-                        <form 
-                            action="/sign-out" 
-                            method="POST" 
-                            use:enhance={() => {
-                                return async ({ result }) => {
-                                    if (result.type === 'success') {
-                                        clearSessionCookieClientSide();
-                                        await goto('/', { invalidateAll: true }); // Redirect to home, invalidate data
-                                    }
-                                };
-                            }}
-                        >
-                            <button
-                                type="submit"
-                                class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
-                                Sign out
-                            </button>
-                        </form>
                     </div>
                 {:else}
+                    <!-- Sign in/Sign up buttons for non-logged in users -->
                     <div class="flex items-center space-x-4">
                         <a
                             href="/sign-in"
-                            class="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                            class="inline-flex items-center px-1 py-2 text-sm font-medium transition-colors duration-200 {$page.url.pathname === '/sign-in' ? 'text-blue-600 border-b-2 border-blue-600 dark:text-blue-400 dark:border-blue-400' : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'}"
+                            aria-current={$page.url.pathname === '/sign-in' ? 'page' : undefined}
                         >
                             Sign in
                         </a>

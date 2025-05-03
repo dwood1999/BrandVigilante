@@ -9,6 +9,9 @@
 	import { theme } from '$lib/stores/theme';
 	import { navigation } from '$lib/stores/navigation';
 	import type { LayoutData } from './$types';
+	import { page } from '$app/stores';
+	import { fade } from 'svelte/transition';
+	import EmailVerificationBanner from '$lib/components/EmailVerificationBanner.svelte';
 
 	export let data: LayoutData;
 	
@@ -25,14 +28,15 @@
 		<SkipLink>
 			<Navbar user={data.user} />
 			
-			{#if showBreadcrumb}
-				<div class="container mx-auto px-4 py-1">
-					<Breadcrumb />
-				</div>
-			{/if}
-			
 			<main class="pt-8">
+				{#if showBreadcrumb}
+					<div class="container mx-auto px-1 py-4">
+						<Breadcrumb />
+					</div>
+				{/if}
+				
 				<RouteTransition>
+					<EmailVerificationBanner />
 					<slot />
 				</RouteTransition>
 			</main>

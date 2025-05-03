@@ -1,6 +1,8 @@
 import mysql from 'mysql2/promise';
 import { dev } from '$app/environment';
 import type { Pool, PoolConnection } from 'mysql2/promise';
+import { env } from '$env/dynamic/private';
+import { logger } from '$lib/logger';
 
 // Define MySQL error interface
 interface MySQLError extends Error {
@@ -24,19 +26,30 @@ interface DbConfig {
 }
 
 const getDbConfig = (): DbConfig => {
+    // Get environment variables with fallbacks
+    const host = env.DB_HOST || env.DATABASE_HOST || 'localhost';
+    const user = env.DB_USER || env.DATABASE_USER || 'dwood';
+    const password = env.DB_PASSWORD || env.DATABASE_PASSWORD || '';
+    const database = env.DB_NAME || env.DATABASE_NAME || 'dwood_db';
+    const connectionLimit = parseInt(env.DB_CONNECTION_LIMIT || '10');
+
+    if (!password) {
+        throw new Error('Database password is required');
+    }
+
     const config: DbConfig = {
-        host: process.env.DATABASE_HOST ?? 'localhost',
-        user: process.env.DATABASE_USER ?? '',
-        password: process.env.DATABASE_PASSWORD ?? '',
-        database: process.env.DATABASE_NAME ?? '',
-        connectionLimit: dev ? 1 : 10,
+        host,
+        user,
+        password,
+        database,
+        connectionLimit,
         waitForConnections: true,
         queueLimit: 0,
         enableKeepAlive: true,
         keepAliveInitialDelay: 0
     };
 
-    console.log('[DB] Initializing connection pool:', {
+    logger.info('[DB] Initializing connection pool:', {
         host: config.host,
         user: config.user,
         database: config.database,
@@ -52,21 +65,21 @@ const pool = mysql.createPool(getDbConfig());
 
 // Handle pool events
 pool.on('connection', (connection: PoolConnection) => {
-    console.log('[DB DEBUG] New connection established', {
+    logger.debug('[DB DEBUG] New connection established', {
         threadId: connection.threadId,
         timestamp: new Date().toISOString()
     });
 });
 
 pool.on('acquire', (connection: PoolConnection) => {
-    console.log('[DB DEBUG] Connection acquired', {
+    logger.debug('[DB DEBUG] Connection acquired', {
         threadId: connection.threadId,
         timestamp: new Date().toISOString()
     });
 });
 
 pool.on('release', (connection: PoolConnection) => {
-    console.log('[DB DEBUG] Connection released', {
+    logger.debug('[DB DEBUG] Connection released', {
         threadId: connection.threadId,
         timestamp: new Date().toISOString()
     });
@@ -78,10 +91,10 @@ export const checkDatabaseConnection = async (): Promise<boolean> => {
         const connection = await pool.getConnection();
         await connection.query('SELECT 1');
         connection.release();
-        console.log('[DB] Connection test successful');
+        logger.info('[DB] Connection test successful');
         return true;
     } catch (error) {
-        console.error('[DB] Connection test failed:', {
+        logger.error('[DB] Connection test failed:', {
             message: error instanceof Error ? error.message : 'Unknown error',
             timestamp: new Date().toISOString()
         });

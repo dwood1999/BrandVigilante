@@ -1,32 +1,27 @@
-import type { RowDataPacket } from 'mysql2';
 import { pool } from '$lib/db';
-import { z } from 'zod'; // You already have zod as a dependency
+import { z } from 'zod';
+import type { RowDataPacket } from 'mysql2';
+import { logger } from '$lib/logger';
+import crypto from 'crypto';
+import { hashPassword } from '$lib/server/auth';
 
 // Define the User schema using Zod for validation
-const UserSchema = z.object({
-    id: z.number(),
+const userSchema = z.object({
+    id: z.number().optional(),
     email: z.string().email(),
-    password: z.string(),
-    phone: z.string().nullable(),
-    role: z.enum(['admin', 'user']).default('user'),
-    created_at: z.string().or(z.date())
+    phone: z.string().optional(),
+    password: z.string().min(8),
+    role: z.enum(['user', 'admin']).default('user'),
+    first_name: z.string(),
+    last_name: z.string(),
+    email_verified: z.boolean().optional()
 });
 
 // TypeScript type derived from the schema
-export type User = z.infer<typeof UserSchema>;
+type User = z.infer<typeof userSchema>;
 
 // Interface for database rows
-export interface UserRow extends RowDataPacket {
-    id: number;
-    first_name: string;
-    last_name: string;
-    email: string;
-    password: string;
-    phone: string;
-    role: 'admin' | 'user';
-    created_at: Date;
-    email_verified: boolean;
-}
+interface UserRow extends RowDataPacket, User {}
 
 export interface PaginatedUsers {
     users: UserRow[];
@@ -36,85 +31,107 @@ export interface PaginatedUsers {
     totalPages: number;
 }
 
-// User model class with static methods for database operations
+// Define the UserModel class
 export class UserModel {
-    static async findAll(): Promise<UserRow[]> {
-        try {
-            const [users] = await pool.query<UserRow[]>(
-                `SELECT id, email, phone, role, first_name, last_name, created_at, email_verified 
-                 FROM users 
-                 ORDER BY created_at DESC`
-            );
-            return users;
-        } catch (error) {
-            logger.error('Error in UserModel.findAll:', error);
-            throw error;
-        }
-    }
+    private static tableName = 'users';
 
-    static async findById(id: number): Promise<UserRow | null> {
-        const [rows] = await pool.query<UserRow[]>(
-            'SELECT * FROM users WHERE id = ?',
-            [id]
-        );
-        return rows[0] || null;
-    }
-
-    static async findByEmail(email: string): Promise<UserRow | null> {
-        const [rows] = await pool.query<UserRow[]>(
-            'SELECT * FROM users WHERE email = ?',
-            [email.toLowerCase()]
-        );
-        return rows[0] || null;
-    }
-
-    static async create(userData: {
-        first_name: string;
-        last_name: string;
-        email: string;
-        password: string;
-        phone: string;
-        role: 'admin' | 'user';
-    }): Promise<UserRow> {
-        const [result] = await pool.query(
-            'INSERT INTO users (first_name, last_name, email, password, phone, role) VALUES (?, ?, ?, ?, ?, ?)',
+    static async create(userData: Omit<User, 'id'>): Promise<User> {
+        const validatedData = userSchema.omit({ id: true }).parse(userData);
+        const [result] = await pool.execute(
+            `INSERT INTO ${this.tableName} (email, phone, password, role, first_name, last_name, email_verified) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
-                userData.first_name,
-                userData.last_name,
-                userData.email.toLowerCase(),
-                userData.password,
-                userData.phone,
-                userData.role
+                validatedData.email,
+                validatedData.phone,
+                validatedData.password,
+                validatedData.role,
+                validatedData.first_name,
+                validatedData.last_name,
+                validatedData.email_verified
             ]
         );
-
         const newUser = await this.findById((result as any).insertId);
         if (!newUser) throw new Error('Failed to create user');
         return newUser;
     }
 
-    static async update(id: number, userData: Partial<UserRow>): Promise<UserRow> {
-        // Build the SET clause dynamically
-        const updates = Object.entries(userData)
-            .filter(([_, value]) => value !== undefined) // Only include defined values
-            .map(([key, _]) => `${key} = ?`);
-        
-        const values = Object.entries(userData)
-            .filter(([_, value]) => value !== undefined)
-            .map(([_, value]) => value);
+    static async findById(id: number): Promise<User | null> {
+        const [rows] = await pool.execute(
+            `SELECT * FROM ${this.tableName} WHERE id = ?`,
+            [id]
+        );
+        return (rows as User[])[0] || null;
+    }
 
-        const sql = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
-        values.push(id);
+    static async findByEmail(email: string): Promise<User | null> {
+        logger.debug('[UserModel.findByEmail] Looking up user by email:', { email });
+        try {
+            const query = `SELECT * FROM ${this.tableName} WHERE email = ?`;
+            logger.debug('[UserModel.findByEmail] Executing query:', { query, params: [email] });
+            const [rows] = await pool.execute(query, [email]);
+            const user = (rows as User[])[0] || null;
+            logger.debug('[UserModel.findByEmail] Query result:', { email, userFound: !!user, userId: user?.id });
+            return user;
+        } catch (error) {
+            const errorContext = {
+                errorObject: error,
+                errorMessage: error instanceof Error ? error.message : String(error),
+                errorStack: error instanceof Error ? error.stack : undefined,
+                errorType: error?.constructor?.name,
+                method: 'UserModel.findByEmail',
+                email
+            };
+            // Explicitly log message and stack using console.error
+            console.error('[UserModel.findByEmail] CAUGHT ERROR - Message:', errorContext.errorMessage);
+            if (errorContext.errorStack) {
+                console.error('[UserModel.findByEmail] CAUGHT ERROR - Stack Trace:', errorContext.errorStack);
+            }
+            // Log the full context object using the logger for potentially better formatting
+            logger.error('[UserModel.findByEmail] Full Error Context:', errorContext); 
+            // Re-throw the error so the action catch block can handle the user-facing response
+            throw error; 
+        }
+    }
 
-        await pool.query(sql, values);
+    static async update(id: number, userData: Partial<User>): Promise<User | null> {
+        const validatedData = userSchema.partial().parse(userData);
+        const fields = Object.keys(validatedData);
+        if (fields.length === 0) return null;
 
+        const setClause = fields.map(field => `${field} = ?`).join(', ');
+        const values = fields.map(field => validatedData[field as keyof typeof validatedData]);
+
+        await pool.execute(
+            `UPDATE ${this.tableName} SET ${setClause} WHERE id = ?`,
+            [...values, id]
+        );
         const updatedUser = await this.findById(id);
         if (!updatedUser) throw new Error('Failed to update user');
         return updatedUser;
     }
 
-    static async delete(id: number): Promise<void> {
-        await pool.query('DELETE FROM users WHERE id = ?', [id]);
+    static async delete(id: number): Promise<boolean> {
+        const [result] = await pool.execute(
+            `DELETE FROM ${this.tableName} WHERE id = ?`,
+            [id]
+        );
+        return (result as any).affectedRows > 0;
+    }
+
+    static async findAll(page = 1, limit = 10): Promise<{ users: User[]; totalPages: number }> {
+        const offset = (page - 1) * limit;
+        const [rows] = await pool.execute(
+            `SELECT * FROM ${this.tableName} LIMIT ? OFFSET ?`,
+            [limit, offset]
+        );
+        const [total] = await pool.execute(
+            `SELECT COUNT(*) as total FROM ${this.tableName}`
+        );
+        const totalPages = Math.ceil((total as any)[0].total / limit);
+        return {
+            users: rows as User[],
+            totalPages
+        };
     }
 
     static async list(options: {
@@ -190,4 +207,50 @@ export class UserModel {
             throw error;
         }
     }
-} 
+
+    static async createPasswordResetToken(userId: string): Promise<string> {
+        const token = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+        await pool.execute(
+            `INSERT INTO password_reset_tokens (user_id, token, expires_at)
+             VALUES (?, ?, ?)
+             ON DUPLICATE KEY UPDATE
+             token = VALUES(token), expires_at = VALUES(expires_at), created_at = NOW()`,
+            [userId, token, expiresAt]
+        );
+
+        return token;
+    }
+
+    static async validatePasswordResetToken(token: string): Promise<string | null> {
+        const [rows] = await pool.execute(
+            `SELECT user_id FROM password_reset_tokens
+             WHERE token = ? AND expires_at > NOW()`,
+            [token]
+        );
+
+        if ((rows as any[]).length === 0) {
+            return null;
+        }
+
+        return (rows as any[])[0].user_id;
+    }
+
+    static async deletePasswordResetToken(token: string): Promise<void> {
+        await pool.execute(
+            `DELETE FROM password_reset_tokens WHERE token = ?`,
+            [token]
+        );
+    }
+
+    static async updatePassword(userId: string, newPassword: string): Promise<void> {
+        const hashedPassword = await hashPassword(newPassword);
+        await pool.execute(
+            `UPDATE users SET password = ? WHERE id = ?`,
+            [hashedPassword, userId]
+        );
+    }
+}
+
+export { type User }; 

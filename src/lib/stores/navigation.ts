@@ -11,7 +11,7 @@ export interface NavigationState {
 
 function createNavigationStore() {
     const { subscribe, set, update } = writable<NavigationState>({
-        activeRoute: '',
+        activeRoute: '/',
         previousRoute: null,
         isNavigating: false,
         navigationHistory: []
@@ -21,9 +21,11 @@ function createNavigationStore() {
     if (browser) {
         try {
             // Subscribe to page store to track navigation
-            page.subscribe(({ url }) => {
+            page.subscribe((page) => {
+                if (!page?.url) return;
+                
                 update(state => {
-                    const currentPath = url.pathname;
+                    const currentPath = page.url.pathname;
                     
                     // Don't update if it's the same route
                     if (state.activeRoute === currentPath) return state;

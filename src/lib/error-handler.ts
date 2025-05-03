@@ -20,9 +20,9 @@ export class ValidationError extends AppError {
     }
 }
 
-export class AuthenticationError extends AppError {
-    constructor(message: string = 'Authentication failed') {
-        super(message, 401, 'AUTHENTICATION_ERROR');
+export class AuthenticationError extends Error {
+    constructor(message: string) {
+        super(message);
         this.name = 'AuthenticationError';
     }
 }
@@ -41,63 +41,50 @@ export class NotFoundError extends AppError {
     }
 }
 
-export function handleError(error: unknown): AppError {
-    // Log the error
+export function handleError(error: unknown): Response {
     logger.error('Error occurred', { error });
 
-    // Handle known error types
-    if (error instanceof AppError) {
-        return error;
-    }
-
-    if (error instanceof DatabaseError) {
-        return new AppError(
-            'Database error occurred',
-            500,
-            'DATABASE_ERROR',
+    if (error instanceof AuthenticationError) {
+        return new Response(
+            JSON.stringify({
+                error: error.message,
+                code: 'AUTHENTICATION_ERROR'
+            }),
             {
-                code: error.code,
-                sqlState: error.sqlState,
-                sqlMessage: error.sqlMessage
+                status: 401,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }
         );
     }
 
-    if (error instanceof QueryError) {
-        return new AppError(
-            'Database query error occurred',
-            500,
-            'QUERY_ERROR',
-            {
-                code: error.code,
-                sqlState: error.sqlState,
-                sqlMessage: error.sqlMessage
-            }
-        );
-    }
-
-    if (error instanceof ConnectionError) {
-        return new AppError(
-            'Database connection error occurred',
-            503,
-            'CONNECTION_ERROR'
-        );
-    }
-
-    // Handle unknown errors
     if (error instanceof Error) {
-        return new AppError(
-            error.message || 'An unexpected error occurred',
-            500,
-            'INTERNAL_SERVER_ERROR'
+        return new Response(
+            JSON.stringify({
+                error: error.message,
+                code: 'INTERNAL_SERVER_ERROR'
+            }),
+            {
+                status: 500,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
         );
     }
 
-    // Handle non-Error objects
-    return new AppError(
-        'An unexpected error occurred',
-        500,
-        'INTERNAL_SERVER_ERROR'
+    return new Response(
+        JSON.stringify({
+            error: 'An unexpected error occurred',
+            code: 'UNKNOWN_ERROR'
+        }),
+        {
+            status: 500,
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
     );
 }
 

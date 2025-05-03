@@ -1,55 +1,20 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
+// See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Error {
-			status: number;
-			message: string;
-			stack?: string;
-		}
-
+		// interface Error {}
 		interface Locals {
-			user: {
+			user?: {
 				id: number;
 				email: string;
 				role: string;
 				first_name: string;
 				last_name: string;
-			} | null;
-		}
-
-		interface PageData {
-			databaseStatus: 'working' | 'failed';
-			features: Array<{
-				title: string;
-				description: string;
-				icon?: string;
-			}>;
-			users: Array<{
-				id: string;
-				email: string;
-				role: string;
-			}>;
-			userMessage: string;
-			meta: {
-				title: string;
-				description: string;
-			};
-			user: {
-				id: number;
-				email: string;
-				role: string;
-				first_name: string;
-				last_name: string;
-			} | null;
-		}
-
-		interface Platform {
-			env: {
-				DATABASE_URL: string;
-				NODE_ENV: string;
+				email_verified: boolean;
 			};
 		}
+		// interface PageData {}
+		// interface Platform {}
 	}
 }
 

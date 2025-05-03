@@ -5,10 +5,25 @@
   export { className as class };
 </script>
 
-<div class={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)} {...$$restProps}>
+<article class={cn("rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md", className)} {...$$restProps}>
   <slot />
-</div>
+</article>
 
 <slot name="header" />
 <slot name="content" />
-<slot name="footer" /> 
+<slot name="footer" />
+
+<style>
+  /* Focus styles */
+  article:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    article {
+      transition: none;
+    }
+  }
+</style> 

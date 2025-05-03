@@ -1,13 +1,13 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { UserModel } from '$lib/models/user';
-import { hashPassword } from '$lib/auth';
-import { sessionConfig } from '$lib/session';
+import { hashPassword, sessionConfig } from '$lib/server/auth';
 import { SignUpSchema } from '$lib/auth';
 import { dev } from '$app/environment';
 import { logger } from '$lib/logger';
 import { VerificationTokenModel } from '$lib/models/verificationToken';
 import { sendEmail, getVerificationEmailContent } from '$lib/email';
+import { z } from 'zod';
 
 export const load: PageServerLoad = async ({ locals }) => {
     if (locals.user) {
@@ -46,6 +46,10 @@ export const actions: Actions = {
                 email_verified: false
             });
 
+            if (!user?.id) {
+                throw new Error('Failed to create user');
+            }
+
             // Generate verification token
             const token = await VerificationTokenModel.create(user.id);
 
@@ -61,30 +65,32 @@ export const actions: Actions = {
                 logger.error(`Failed to send verification email to ${email}`);
             }
 
-            // Set session cookie
+            // Set session cookie with secure options
             cookies.set(sessionConfig.cookieName, user.id.toString(), {
                 ...sessionConfig,
-                secure: !dev // Allow non-HTTPS in development
+                secure: !dev, // Allow non-HTTPS in development
+                httpOnly: true,
+                sameSite: 'strict',
+                path: '/'
             });
 
             logger.info(`New user registered: ${email}`);
 
-            // Return success before redirect
-            return { success: true, userId: user.id };
+            // Redirect to success page with email parameter
+            throw redirect(303, `/registration-success?email=${encodeURIComponent(email)}`);
 
         } catch (error) {
-            logger.error('Registration error:', error);
-
-            if (error.errors) {
-                // Format Zod validation errors
-                const fieldErrors = error.flatten().fieldErrors;
+            console.error('Error in sign-up action:', error);
+            
+            if (error instanceof z.ZodError) {
                 return fail(400, {
-                    fieldErrors,
+                    message: 'Please check your input',
+                    fieldErrors: error.flatten().fieldErrors,
                     data: {
-                        email: data.email,
-                        phone: data.phone,
-                        first_name: data.first_name,
-                        last_name: data.last_name
+                        email: data.email?.toString(),
+                        phone: data.phone?.toString(),
+                        first_name: data.first_name?.toString(),
+                        last_name: data.last_name?.toString()
                     }
                 });
             }
@@ -92,10 +98,10 @@ export const actions: Actions = {
             return fail(500, {
                 message: 'An unexpected error occurred. Please try again.',
                 data: {
-                    email: data.email,
-                    phone: data.phone,
-                    first_name: data.first_name,
-                    last_name: data.last_name
+                    email: data.email?.toString(),
+                    phone: data.phone?.toString(),
+                    first_name: data.first_name?.toString(),
+                    last_name: data.last_name?.toString()
                 }
             });
         }

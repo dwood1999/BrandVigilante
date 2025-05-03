@@ -1,7 +1,7 @@
 import { dev } from '$app/environment';
 
 export const sessionConfig = {
-    cookieName: 'userId',
+    cookieName: 'session',
     maxAge: 7 * 24 * 60 * 60, // 7 days
     secure: !dev, // Only require HTTPS in production
     httpOnly: true,
