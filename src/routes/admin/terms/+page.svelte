@@ -47,9 +47,12 @@
     <div class="mt-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Search -->
         <div class="w-full max-w-lg">
-            <SearchInput
+            <label for="searchQuery" class="block text-sm font-medium text-gray-900 mb-1">Search</label>
+            <input
+                id="searchQuery"
+                type="text"
                 bind:value={searchQuery}
-                placeholder="Search terms or brands..."
+                class="block w-full bg-white border border-gray-200 rounded-lg h-12 px-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
         </div>
 

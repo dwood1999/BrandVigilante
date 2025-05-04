@@ -59,19 +59,22 @@
     <!-- Filters -->
     <div class="mt-8 flex flex-col sm:flex-row gap-4">
         <div class="flex-1">
+            <label for="search" class="block text-sm font-medium text-gray-900 mb-1">Search</label>
             <input
+                id="search"
                 type="text"
-                placeholder="Search users..."
                 bind:value={search}
                 on:input={() => updateQueryParams()}
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                class="block w-full bg-white border border-gray-200 rounded-lg h-12 px-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
         </div>
         <div class="sm:w-48">
+            <label for="role" class="block text-sm font-medium text-gray-900 mb-1">Role</label>
             <select
+                id="role"
                 bind:value={selectedRole}
                 on:change={() => updateQueryParams()}
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                class="block w-full bg-white border border-gray-200 rounded-lg h-12 px-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             >
                 <option value="">All roles</option>
                 <option value="user">User</option>
@@ -79,10 +82,12 @@
             </select>
         </div>
         <div class="sm:w-32">
+            <label for="perPage" class="block text-sm font-medium text-gray-900 mb-1">Per Page</label>
             <select
+                id="perPage"
                 bind:value={perPage}
                 on:change={() => updateQueryParams()}
-                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                class="block w-full bg-white border border-gray-200 rounded-lg h-12 px-4 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             >
                 <option value={10}>10 / page</option>
                 <option value={25}>25 / page</option>
