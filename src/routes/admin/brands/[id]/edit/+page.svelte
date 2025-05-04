@@ -57,48 +57,20 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mt-8 bg-white shadow sm:rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-                <FormContainer 
-                    onSubmit={() => {
+                <form
+                    method="POST"
+                    action="?/update"
+                    class="space-y-6"
+                    use:enhance={() => {
                         loading = true;
-                        return async ({ result }: { result: FormResult }) => {
+                        return async ({ result }) => {
                             loading = false;
                             if (result.type === 'success') {
                                 window.location.href = '/admin/brands';
                             }
                         };
                     }}
-                    className="space-y-6"
                 >
-                    <FormGroup legend="Brand Information">
-                        <FormField
-                            label="Brand Name"
-                            name="name"
-                            type="text"
-                            bind:value={name}
-                            required
-                            error={form?.fieldErrors?.name}
-                            placeholder="Enter brand name"
-                        />
-
-                        <FormField
-                            label="Website URL"
-                            name="url"
-                            type="url"
-                            bind:value={url}
-                            error={form?.fieldErrors?.url}
-                            placeholder="https://example.com"
-                        />
-
-                        <FormField
-                            label="Description"
-                            name="description"
-                            type="text"
-                            bind:value={description}
-                            error={form?.fieldErrors?.description}
-                            placeholder="Enter brand description"
-                        />
-                    </FormGroup>
-
                     {#if form?.error}
                         <div class="rounded-md bg-red-50 p-4">
                             <div class="flex">
@@ -110,6 +82,63 @@
                             </div>
                         </div>
                     {/if}
+
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-sm font-medium leading-6 text-gray-900">
+                                Brand Name
+                            </label>
+                            <div class="mt-2">
+                                <input
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    bind:value={name}
+                                    required
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            {#if form?.fieldErrors?.name}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.name}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label for="url" class="block text-sm font-medium leading-6 text-gray-900">
+                                Website URL
+                            </label>
+                            <div class="mt-2">
+                                <input
+                                    type="url"
+                                    name="url"
+                                    id="url"
+                                    bind:value={url}
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            {#if form?.fieldErrors?.url}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.url}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label for="description" class="block text-sm font-medium leading-6 text-gray-900">
+                                Description
+                            </label>
+                            <div class="mt-2">
+                                <textarea
+                                    name="description"
+                                    id="description"
+                                    bind:value={description}
+                                    rows="3"
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                ></textarea>
+                            </div>
+                            {#if form?.fieldErrors?.description}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.description}</p>
+                            {/if}
+                        </div>
+                    </div>
 
                     <div class="flex justify-end gap-x-3">
                         <a
@@ -126,7 +155,7 @@
                             {loading ? 'Saving...' : 'Save Changes'}
                         </button>
                     </div>
-                </FormContainer>
+                </form>
             </div>
         </div>
     </div>

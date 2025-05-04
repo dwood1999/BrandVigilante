@@ -26,9 +26,9 @@
     <title>Edit Term - {data.brand.name} - Admin Dashboard</title>
 </svelte:head>
 
-<div class="min-h-full bg-gray-50" in:fade>
+<div class="min-h-full" in:fade>
     <div class="py-6">
-        <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="min-w-0 flex-1">
                     <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
@@ -48,15 +48,14 @@
                 </div>
             </div>
 
-            <div class="mt-8 space-y-6">
-                <!-- Update Form -->
+            <div class="mt-8">
                 <form
                     method="POST"
                     action="?/update"
-                    class="bg-gray-100 shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+                    class="bg-white shadow sm:rounded-lg"
                     use:enhance={handleSubmit}
                 >
-                    <div class="px-4 py-6 sm:p-8">
+                    <div class="px-4 py-5 sm:p-6">
                         {#if form?.error}
                             <div class="mb-6 rounded-md bg-red-50 p-4">
                                 <div class="flex">
@@ -68,8 +67,8 @@
                             </div>
                         {/if}
 
-                        <div class="grid max-w-2xl grid-cols-1 gap-x-6 gap-y-8">
-                            <div class="col-span-full">
+                        <div class="space-y-6">
+                            <div>
                                 <label for="term" class="block text-sm font-medium leading-6 text-gray-900">
                                     Trademark Term
                                 </label>
@@ -80,7 +79,7 @@
                                         id="term"
                                         required
                                         value={data.term.term}
-                                        class="block w-full rounded-md bg-white border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6"
+                                        class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                                     />
                                 </div>
                                 <p class="mt-3 text-sm leading-6 text-gray-600">
@@ -89,7 +88,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center justify-end gap-x-6 border-t border-gray-300 bg-gray-50 px-4 py-4 sm:px-8 rounded-b-xl">
+                    <div class="flex items-center justify-end gap-x-6 border-t border-gray-200 px-4 py-4 sm:px-6">
                         <button
                             type="button"
                             class="text-sm font-semibold leading-6 text-red-600 hover:text-red-500"

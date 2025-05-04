@@ -51,7 +51,7 @@
 </script>
 
 <div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-8">
+    <div class="flex flex-wrap justify-between items-center gap-4 sm:gap-0 mb-8">
         <div>
             <h1 class="text-3xl font-bold">Welcome, {user.first_name}!</h1>
             <p class="text-muted-foreground mt-1">Manage your brands and monitor their performance</p>

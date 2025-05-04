@@ -120,27 +120,28 @@ export class ListingModel {
 
         const [rows] = await pool.query<ListingRow[]>(
             `SELECT l.*, 
-                    p.title as product_title, p.upc as product_upc, p.ean as product_ean,
-                    m.platform_name as marketplace_name, m.country_code as marketplace_country,
-                    s.id as seller_id, s.seller_name, s.seller_url,
-                    sl.is_buybox_winner
+                    MAX(p.title) as product_title, MAX(p.upc) as product_upc, MAX(p.ean) as product_ean,
+                    MAX(m.platform_name) as marketplace_name, MAX(m.country_code) as marketplace_country,
+                    MAX(s.id) as seller_id, MAX(s.seller_name) as seller_name, MAX(s.seller_url) as seller_url,
+                    MAX(sl.is_buybox_winner) as is_buybox_winner
              FROM listings l
              JOIN products p ON l.product_id = p.id
              JOIN marketplaces m ON l.marketplace_id = m.id
-             LEFT JOIN seller_listings sl ON l.id = sl.listing_id
+             LEFT JOIN seller_listings sl ON l.id = sl.listing_id AND sl.is_buybox_winner = TRUE
              LEFT JOIN sellers s ON sl.seller_id = s.id
              ${whereClause}
+             GROUP BY l.id
              ORDER BY l.created_at DESC
              LIMIT ? OFFSET ?`,
             [...queryParams, params.perPage, offset]
         );
 
         const [countResult] = await pool.query<RowDataPacket[]>(
-            `SELECT COUNT(*) as total
+            `SELECT COUNT(DISTINCT l.id) as total
              FROM listings l
              JOIN products p ON l.product_id = p.id
              JOIN marketplaces m ON l.marketplace_id = m.id
-             LEFT JOIN seller_listings sl ON l.id = sl.listing_id
+             LEFT JOIN seller_listings sl ON l.id = sl.listing_id AND sl.is_buybox_winner = TRUE
              LEFT JOIN sellers s ON sl.seller_id = s.id
              ${whereClause}`,
             queryParams

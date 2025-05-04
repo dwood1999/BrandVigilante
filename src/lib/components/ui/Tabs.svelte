@@ -17,15 +17,17 @@
   }
   
   $: tabClasses = `
-    flex space-x-1 rounded-lg bg-gray-100 p-1
+    flex space-x-1 rounded-lg bg-gray-100 dark:bg-gray-700 p-1 overflow-x-auto
     ${class_}
   `;
   
   $: tabButtonClasses = (tabId: string) => `
-    w-full rounded-md py-2.5 text-sm font-medium leading-5
+    w-full rounded-md py-3 px-3 text-sm font-medium leading-5 min-h-[44px] whitespace-nowrap
+    flex-shrink-0
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-gray-100 dark:focus:ring-offset-gray-700
     ${activeTab === tabId
-      ? 'bg-white text-blue-700 shadow'
-      : 'text-gray-700 hover:bg-white/[0.12] hover:text-blue-600'}
+      ? 'bg-white text-blue-700 shadow dark:bg-gray-900 dark:text-white'
+      : 'text-gray-700 hover:bg-white/[0.6] dark:text-gray-300 dark:hover:text-white/80 dark:hover:bg-gray-800/[0.6]'}
     ${tabs.find(t => t.id === tabId)?.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
   `;
 </script>

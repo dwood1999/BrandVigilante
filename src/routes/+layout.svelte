@@ -23,10 +23,10 @@
 	<meta name="theme-color" content={$theme === 'dark' ? '#1a1a1a' : '#ffffff'} />
 </svelte:head>
 
-<div class="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+<div class="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 	<ErrorBoundary>
 		<SkipLink>
-			<Navbar user={data.user} />
+			<Navbar />
 			
 			<main class="pt-8">
 				{#if showBreadcrumb}

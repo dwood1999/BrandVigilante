@@ -38,12 +38,19 @@
     $: isValid = term.trim().length > 0 && brandId !== '';
 </script>
 
-<FormContainer 
-    onSubmit={onSubmit}
-    className="space-y-6"
-    {...$$restProps}
+<form
+    method="POST"
+    class="space-y-6"
+    use:enhance={({ formData, cancel }) => {
+        return async ({ result, update }) => {
+            if (onSubmit) {
+                onSubmit({ type: result.type, data: result.data } as any);
+            }
+            await update();
+        };
+    }}
 >
-    <FormGroup legend="Trademark Term Details">
+    <div class="space-y-6">
         <div>
             <label for="brand" class="block text-sm font-medium leading-6 text-gray-900">
                 Brand *
@@ -54,7 +61,7 @@
                     name="brandId"
                     bind:value={brandId}
                     required
-                    class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 >
                     <option value="">Select a brand</option>
                     {#each brands as brand}
@@ -67,16 +74,25 @@
             {/if}
         </div>
 
-        <FormField
-            label="Trademark Term"
-            name="term"
-            type="text"
-            bind:value={term}
-            required
-            error={form?.error && form.error.includes('term') ? form.error : ''}
-            placeholder="Enter trademark term"
-        />
-    </FormGroup>
+        <div>
+            <label for="term" class="block text-sm font-medium leading-6 text-gray-900">
+                Trademark Term
+            </label>
+            <div class="mt-2">
+                <input
+                    type="text"
+                    name="term"
+                    id="term"
+                    bind:value={term}
+                    required
+                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                />
+            </div>
+            {#if form?.error && form.error.includes('term')}
+                <p class="mt-2 text-sm text-red-600">{form.error}</p>
+            {/if}
+        </div>
+    </div>
 
     {#if form?.error && !form.error.includes('term') && !form.error.includes('brand')}
         <div class="rounded-md bg-red-50 p-4">
@@ -105,4 +121,4 @@
             {loading ? 'Saving...' : 'Save Term'}
         </button>
     </div>
-</FormContainer> 
+</form> 

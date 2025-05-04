@@ -36,7 +36,7 @@
 
         <form
             method="POST"
-            class="mt-8 bg-gray-100 shadow-sm ring-1 ring-gray-900/5 rounded-xl"
+            class="mt-8 bg-white shadow sm:rounded-lg"
             use:enhance={() => {
                 loading = true;
                 return async ({ result, update }) => {
@@ -49,9 +49,9 @@
                 };
             }}
         >
-            <div class="px-4 py-6 sm:p-8">
+            <div class="px-4 py-5 sm:p-6">
                 {#if form?.error}
-                    <div class="mb-4 rounded-md bg-red-50 p-4">
+                    <div class="mb-6 rounded-md bg-red-50 p-4">
                         <div class="flex">
                             <div class="ml-3">
                                 <h3 class="text-sm font-medium text-red-800">Error</h3>
@@ -61,28 +61,27 @@
                     </div>
                 {/if}
 
-                <div class="grid grid-cols-1 gap-6">
+                <div class="space-y-6">
                     <div>
-                        <label for="term" class="block text-sm font-medium text-gray-700">
+                        <label for="term" class="block text-sm font-medium leading-6 text-gray-900">
                             Trademark Term
                         </label>
-                        <div class="mt-1">
+                        <div class="mt-2">
                             <input
                                 type="text"
                                 name="term"
                                 id="term"
                                 required
-                                class="block w-full rounded-md bg-white border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 sm:text-sm sm:leading-6"
-                                placeholder="Enter trademark term"
+                                class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                             />
                         </div>
-                        <p class="mt-2 text-sm text-gray-500">
+                        <p class="mt-3 text-sm leading-6 text-gray-600">
                             Enter the exact term you want to monitor.
                         </p>
                     </div>
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-x-6 border-t border-gray-300 bg-gray-50 px-4 py-4 sm:px-8 rounded-b-xl">
+            <div class="flex items-center justify-end gap-x-6 border-t border-gray-200 px-4 py-4 sm:px-6">
                 <button
                     type="submit"
                     class="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50"
