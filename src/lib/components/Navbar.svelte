@@ -94,12 +94,14 @@
 
     // Make desktopNavItems reactive to user changes
     $: desktopNavItems = [
-        { href: '/', label: 'Home' },
-        { href: '/platform', label: 'Platform' },
-        { href: '/pricing', label: 'Pricing' },
-        { href: '/enforcement', label: 'Enforcement' },
-        { href: '/technology', label: 'Technology' },
-        { href: '/contact', label: 'Contact' },
+        ...(!$page.data.user ? [
+            { href: '/', label: 'Home' },
+            { href: '/platform', label: 'Platform' },
+            { href: '/pricing', label: 'Pricing' },
+            { href: '/enforcement', label: 'Enforcement' },
+            { href: '/technology', label: 'Technology' },
+            { href: '/contact', label: 'Contact' },
+        ] : []),
         ...($page.data.user
             ? [
                 { href: '/dashboard', label: 'Dashboard' },

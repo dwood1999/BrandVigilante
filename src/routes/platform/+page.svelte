@@ -1,20 +1,31 @@
 <script lang="ts">
     import { Button } from "$lib/components/ui/button";
     import PageTemplate from "$lib/components/ui/PageTemplate.svelte";
+    import SignupForm from "$lib/components/SignupForm.svelte";
 </script>
 
-<PageTemplate
-    title="Platform Services"
-    description="Comprehensive brand protection solutions designed to safeguard your digital presence across all channels."
->
+<PageTemplate>
     <div class="min-h-screen">
-        <!-- Platform Hero -->
-        <section class="container mx-auto px-4 py-20">
-            <h1 class="text-5xl font-bold text-center mb-8 text-foreground">Our Platform Services</h1>
-            <p class="text-xl text-center text-muted-foreground max-w-3xl mx-auto">
+        <!-- Title Section -->
+        <section class="container mx-auto px-4 pt-8">
+            <h1 class="text-4xl font-bold text-center mb-8 text-foreground">Platform Services</h1>
+        </section>
+
+        <!-- Main Links Section -->
+        <section class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-6 mb-8">
+                <a href="/platform" class="px-8 py-4 rounded-lg bg-lime-600 text-white font-semibold text-lg shadow hover:bg-lime-700 transition">Platform</a>
+                <a href="/pricing" class="px-8 py-4 rounded-lg bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 transition">Pricing</a>
+                <a href="/enforcement" class="px-8 py-4 rounded-lg bg-orange-600 text-white font-semibold text-lg shadow hover:bg-orange-700 transition">Enforcement</a>
+                <a href="/technology" class="px-8 py-4 rounded-lg bg-gray-800 text-white font-semibold text-lg shadow hover:bg-gray-900 transition">Technology</a>
+            </div>
+            <p class="text-center text-lg text-muted-foreground max-w-2xl mx-auto mb-12">
                 Comprehensive brand protection solutions designed to safeguard your digital presence across all channels.
             </p>
         </section>
+
+        <!-- Platform Hero -->
+        <!-- Removed empty section to reduce space -->
 
         <!-- Services Section -->
         <section class="py-16 font-sans">
@@ -215,9 +226,11 @@
                                     </li>
                                 {/each}
                             </ul>
-                            <Button class="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
-                                {plan.buttonText}
-                            </Button>
+                            <SignupForm>
+                                <Button class="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
+                                    {plan.buttonText}
+                                </Button>
+                            </SignupForm>
                         </div>
                     {/each}
                 </div>
@@ -231,9 +244,11 @@
                 <p class="text-xl mb-8 max-w-2xl mx-auto text-muted-foreground">
                     Schedule a demo to see how our platform can safeguard your brand across all digital channels.
                 </p>
-                <Button size="lg" class="bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
-                    Schedule Demo
-                </Button>
+                <SignupForm>
+                    <Button size="lg" class="bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
+                        Get More Information
+                    </Button>
+                </SignupForm>
             </div>
         </section>
     </div>

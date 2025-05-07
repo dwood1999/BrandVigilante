@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
 			host: true,
 			port: 5173,
 			strictPort: true,
-			https: process.env.NODE_ENV === 'production',
+			https: process.env.NODE_ENV === 'production' ? {} : false,
 			headers: {
 				'X-Frame-Options': 'DENY',
 				'X-Content-Type-Options': 'nosniff',
@@ -35,7 +35,9 @@ export default defineConfig(({ mode }) => {
 		},
 		// Make env variables available to the app
 		define: {
-			'process.env': env
+			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+			'process.env.VITE_APP_URL': JSON.stringify(process.env.VITE_APP_URL),
+			'process.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL)
 		},
 		test: {
 			workspace: [

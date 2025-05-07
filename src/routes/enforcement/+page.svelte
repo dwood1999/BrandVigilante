@@ -5,6 +5,12 @@ import { Button } from '$lib/components/ui/button';
 <div class="min-h-screen bg-background text-foreground">
     <section class="container mx-auto px-4 py-20">
         <h1 class="text-5xl font-bold text-center mb-8 text-foreground">Marketplace Enforcement</h1>
+        <div class="flex flex-wrap justify-center gap-6 mb-8">
+            <a href="/platform" class="px-8 py-4 rounded-lg bg-lime-600 text-white font-semibold text-lg shadow hover:bg-lime-700 transition">Platform</a>
+            <a href="/pricing" class="px-8 py-4 rounded-lg bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 transition">Pricing</a>
+            <a href="/enforcement" class="px-8 py-4 rounded-lg bg-orange-600 text-white font-semibold text-lg shadow hover:bg-orange-700 transition">Enforcement</a>
+            <a href="/technology" class="px-8 py-4 rounded-lg bg-gray-800 text-white font-semibold text-lg shadow hover:bg-gray-900 transition">Technology</a>
+        </div>
         <p class="text-xl text-center text-muted-foreground max-w-3xl mx-auto mb-12">
             Safeguard your brand's reputation across major marketplaces with AI-powered monitoring and automated takedown procedures. Our solution has helped brands remove over 100,000 counterfeit listings in 2023 alone.
         </p>

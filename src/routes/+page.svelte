@@ -59,14 +59,14 @@
                         Stay ahead of digital risks with our comprehensive brand protection platform.
                     </p>
                     <div class="flex gap-4">
+                        <a href="/sign-up" class="inline-flex items-center justify-center h-12 px-6 rounded-lg bg-blue-600 text-white font-semibold text-base shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                            Get Started
+                        </a>
                         <SignupForm>
-                            <Button size="lg" variant="default">
-                                Get Started
+                            <Button size="lg" variant="outline">
+                                Get More Information
                             </Button>
                         </SignupForm>
-                        <Button size="lg" variant="outline">
-                            Schedule Demo
-                        </Button>
                     </div>
                 </div>
                 
@@ -128,6 +128,16 @@
                         </svg>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <!-- Main Links Section (full-width, like on Platform page) -->
+        <section class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-6 mb-8">
+                <a href="/platform" class="px-8 py-4 rounded-lg bg-lime-600 text-white font-semibold text-lg shadow hover:bg-lime-700 transition">Platform</a>
+                <a href="/pricing" class="px-8 py-4 rounded-lg bg-blue-600 text-white font-semibold text-lg shadow hover:bg-blue-700 transition">Pricing</a>
+                <a href="/enforcement" class="px-8 py-4 rounded-lg bg-orange-600 text-white font-semibold text-lg shadow hover:bg-orange-700 transition">Enforcement</a>
+                <a href="/technology" class="px-8 py-4 rounded-lg bg-gray-800 text-white font-semibold text-lg shadow hover:bg-gray-900 transition">Technology</a>
             </div>
         </section>
 

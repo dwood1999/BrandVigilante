@@ -3,7 +3,7 @@
     import type { LayoutData } from './$types';
     import { fade } from 'svelte/transition';
 
-    export let data: LayoutData;
+    export const data: LayoutData = { user: null };
 </script>
 
 <div class="min-h-screen bg-gray-50" in:fade>

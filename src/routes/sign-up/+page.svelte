@@ -116,8 +116,6 @@
 
 <style>
     @media (prefers-reduced-motion: reduce) {
-        .transition-all {
-            transition: none;
-        }
+        /* No transitions needed */
     }
 </style> 

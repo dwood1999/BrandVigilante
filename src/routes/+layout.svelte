@@ -13,7 +13,7 @@
 	import { fade } from 'svelte/transition';
 	import EmailVerificationBanner from '$lib/components/EmailVerificationBanner.svelte';
 
-	export let data: LayoutData;
+	export const data: LayoutData = { user: null };
 	
 	// Show breadcrumb only on non-home pages
 	$: showBreadcrumb = $navigation.activeRoute !== '/';

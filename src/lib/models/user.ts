@@ -10,8 +10,8 @@ const userSchema = z.object({
     id: z.number().optional(),
     email: z.string().email(),
     phone: z.string().optional(),
-    password: z.string().min(8),
-    role: z.enum(['user', 'admin']).default('user'),
+    password: z.string().min(8).or(z.literal('')),
+    role: z.enum(['user', 'admin', 'lead']).default('user'),
     first_name: z.string(),
     last_name: z.string(),
     email_verified: z.boolean().optional()
@@ -138,7 +138,7 @@ export class UserModel {
         page: number;
         perPage: number;
         search?: string;
-        role?: 'admin' | 'user';
+        role?: 'admin' | 'user' | 'lead';
     }): Promise<PaginatedUsers> {
         const { page, perPage, search, role } = options;
         const offset = (page - 1) * perPage;
