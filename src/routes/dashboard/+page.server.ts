@@ -40,28 +40,55 @@ interface DashboardData {
 
 export const load: PageServerLoad = async ({ locals }): Promise<DashboardData> => {
     if (!locals.user) {
+        console.error('Dashboard Load: No locals.user, redirecting to sign-in.');
         throw redirect(302, '/sign-in');
     }
 
     try {
+        console.log('Dashboard Load: Fetching user by ID:', locals.user.id);
         const user = await UserModel.findById(locals.user.id);
+        
         if (!user) {
+            console.error('Dashboard Load: User not found by ID in DB, redirecting to sign-in. locals.user.id was:', locals.user.id);
             throw redirect(302, '/sign-in');
         }
+        console.log('Dashboard Load: User found in DB:'); // Avoid logging entire user object for brevity if it's large or sensitive
 
         const brands = await BrandModel.findByUserId(user.id);
+        console.log('Dashboard Load: Brands fetched for user ID:', user.id);
+
+        // Ensure created_at is a Date object before calling toISOString
+        const createdAtString = user.created_at instanceof Date 
+            ? user.created_at.toISOString() 
+            : user.created_at // If it's already a string, use as is, or handle if it's null/undefined
+              ? new Date(user.created_at).toISOString() // Attempt to parse if string
+              : new Date().toISOString(); // Fallback or error
+
+        if (!(user.created_at instanceof Date) && typeof user.created_at !== 'string') {
+            console.warn('Dashboard Load: user.created_at was not a Date or string, using current date as fallback. Value was:', user.created_at);
+        }
+
 
         return {
             user: {
                 ...user,
-                created_at: user.created_at.toISOString(),
-                lastLogin: new Date().toISOString(), // You might want to store this in the database
-                email_verified: locals.user.email_verified
+                // Ensure created_at and lastLogin are handled safely
+                created_at: createdAtString,
+                lastLogin: new Date().toISOString(),
+                email_verified: locals.user.email_verified ?? false // Ensure fallback if undefined
             },
             brands
         };
     } catch (error) {
-        console.error('Error loading dashboard:', error);
-        throw redirect(302, '/sign-in');
+        console.error('Dashboard Load: CATCH BLOCK - Error loading dashboard data:', error);
+        // Check if the error is a SvelteKit redirect object
+        const errorObj = error as any;
+        if (errorObj?.constructor?.name === 'Redirect' && errorObj.status && errorObj.location) {
+            console.log('Dashboard Load: CATCH BLOCK - Re-throwing SvelteKit redirect.');
+            throw error; // Re-throw the original redirect
+        }
+        // For other errors, redirect to sign-in
+        console.log('Dashboard Load: CATCH BLOCK - Redirecting to /sign-in due to error.');
+        throw redirect(302, '/sign-in?error=dashboard_load_failed');
     }
 }; 

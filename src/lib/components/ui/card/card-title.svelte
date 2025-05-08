@@ -1,10 +1,9 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
 
-  let className: string | undefined | null = undefined;
-  export { className as class };
+  export let class_name = "";
 </script>
 
-<h3 class={cn("text-lg font-semibold leading-none tracking-tight", className)} {...$$restProps}>
+<h3 class={cn("text-2xl font-semibold leading-none tracking-tight", class_name)}>
   <slot />
 </h3> 

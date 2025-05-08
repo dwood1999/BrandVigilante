@@ -1,6 +1,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { UserModel } from '$lib/models/user';
 import { validateSession, sessionConfig } from '$lib/server/auth';
+import { auth } from '$lib/server/lucia';
 import { logger } from '$lib/logger';
 import { handleError, AuthenticationError } from '$lib/error-handler';
 import type { RowDataPacket } from 'mysql2';
@@ -19,170 +20,124 @@ export const handle: Handle = async ({ event, resolve }) => {
         return await resolve(event);
     }
     
-    const userId = event.cookies.get(sessionConfig.cookieName);
+    // Use Lucia's cookie name from sessionConfig
+    const sessionId = event.cookies.get(sessionConfig.cookieName);
     
     logger.debug('=== HOOKS SERVER START ===', {
         url: event.url.pathname,
         method: event.request.method,
-        sessionCookie: userId,
-        sessionCookieType: typeof userId,
-        sessionCookieLength: userId?.length,
+        sessionCookie: sessionId,
+        cookieName: sessionConfig.cookieName,
         allCookies: event.cookies.getAll().map(c => ({
             name: c.name,
-            value: c.value,
-            valueType: typeof c.value,
-            valueLength: c.value?.length
-        })),
-        requestHeaders: Object.fromEntries(event.request.headers.entries()),
-        requestUrl: event.url.toString()
+            value: c.value ? c.value.substring(0, 10) + '...' : null
+        }))
     });
 
     try {
-        if (userId) {
+        if (sessionId) {
             logger.debug('=== SESSION VALIDATION START ===', { 
-                userId,
-                userIdType: typeof userId,
-                userIdLength: userId.length,
-                rawCookie: event.cookies.get(sessionConfig.cookieName),
-                rawCookieType: typeof event.cookies.get(sessionConfig.cookieName),
-                rawCookieLength: event.cookies.get(sessionConfig.cookieName)?.length,
-                allCookies: event.cookies.getAll().map(c => ({
-                    name: c.name,
-                    value: c.value,
-                    valueType: typeof c.value,
-                    valueLength: c.value?.length
-                })),
-                requestHeaders: Object.fromEntries(event.request.headers.entries()),
-                requestUrl: event.url.toString(),
-                cookieOptions: sessionConfig
+                sessionId,
+                cookieName: sessionConfig.cookieName
             });
 
-            if (validateSession(userId)) {
-                const parsedUserId = parseInt(userId);
-                logger.debug('=== USER LOOKUP START ===', { 
-                    userId,
-                    userIdType: typeof userId,
-                    userIdLength: userId.length,
-                    parsedUserId,
-                    parsedUserIdType: typeof parsedUserId,
-                    parsedUserIdString: parsedUserId.toString(),
-                    parsedUserIdLength: parsedUserId.toString().length,
-                    isNaN: isNaN(parsedUserId),
-                    rawCookie: event.cookies.get(sessionConfig.cookieName),
-                    rawCookieType: typeof event.cookies.get(sessionConfig.cookieName),
-                    rawCookieLength: event.cookies.get(sessionConfig.cookieName)?.length,
-                    allCookies: event.cookies.getAll().map(c => ({
-                        name: c.name,
-                        value: c.value,
-                        valueType: typeof c.value,
-                        valueLength: c.value?.length
-                    })),
-                    requestHeaders: Object.fromEntries(event.request.headers.entries()),
-                    requestUrl: event.url.toString()
-                });
-
+            if (validateSession(sessionId)) {
+                // Use Lucia to validate the session
                 try {
-                    const user = await UserModel.findById(parsedUserId);
-                    logger.debug('=== USER LOOKUP RESULT ===', {
-                        userFound: !!user,
-                        userId: user?.id,
-                        email: user?.email,
-                        role: user?.role
-                    });
-
-                    if (!user || user.id === undefined) {
-                        logger.warn('=== INVALID USER ID IN SESSION ===', { 
-                            userId,
-                            parsedUserId,
-                            rawCookie: event.cookies.get(sessionConfig.cookieName),
-                            isNaN: isNaN(parsedUserId),
-                            parsedUserIdType: typeof parsedUserId
-                        });
-                        event.cookies.delete(sessionConfig.cookieName, { path: '/' });
-                        return resolve(event);
-                    }
-
-                    // Set the user in locals
-                    event.locals.user = {
-                        id: user.id,
-                        email: user.email,
-                        role: user.role,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
-                        email_verified: user.email_verified || false
-                    };
-
-                    logger.info('=== USER SESSION VALIDATED ===', { 
-                        userId: user.id,
-                        email: user.email,
-                        role: user.role,
-                        userData: {
-                            id: user.id,
-                            email: user.email,
-                            role: user.role,
-                            created_at: (user as UserRow).created_at,
-                            updated_at: (user as UserRow).updated_at
-                        },
-                        rawCookie: event.cookies.get(sessionConfig.cookieName),
-                        allCookies: event.cookies.getAll().map(c => ({
-                            name: c.name,
-                            value: c.value
-                        })),
-                        requestHeaders: Object.fromEntries(event.request.headers.entries()),
-                        requestUrl: event.url.toString()
-                    });
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-                    const errorStack = error instanceof Error ? error.stack : undefined;
+                    // Get session and user from Lucia
+                    const validated = await auth.validateSession(sessionId);
                     
-                    logger.error('=== ERROR LOADING USER ===', { 
-                        error,
-                        errorMessage,
-                        errorStack,
-                        userId,
-                        parsedUserId,
-                        rawCookie: event.cookies.get(sessionConfig.cookieName),
-                        allCookies: event.cookies.getAll().map(c => ({
-                            name: c.name,
-                            value: c.value
-                        })),
-                        requestHeaders: Object.fromEntries(event.request.headers.entries()),
-                        requestUrl: event.url.toString(),
-                        parsedUserIdType: typeof parsedUserId,
-                        isNaN: isNaN(parsedUserId),
-                        errorType: error?.constructor?.name,
-                        errorString: error?.toString()
-                    });
+                    if (validated && validated.session && validated.user) {
+                        const { session, user } = validated;
+                        logger.debug('=== LUCIA SESSION VALIDATED ===', {
+                            sessionId: session.id,
+                            userId: user.id, // Assuming user object has the ID we need
+                            userEmail: user.email
+                        });
+                        
+                        // Use user.id directly if it's already a number, or parse if needed
+                        const userIdNum = typeof user.id === 'number' ? user.id : Number(user.id);
 
-                    // Delete the invalid session cookie
-                    event.cookies.delete(sessionConfig.cookieName, { path: '/' });
-
-                    // Return a proper error response
-                    return new Response(JSON.stringify({
-                        error: 'Session validation failed',
-                        code: 'AUTHENTICATION_ERROR',
-                        details: errorMessage
-                    }), {
-                        status: 401,
-                        headers: {
-                            'Content-Type': 'application/json'
+                        if (isNaN(userIdNum)) {
+                             logger.error('=== CRITICAL: FAILED TO GET VALID NUMERIC USER ID FROM LUCIA USER OBJECT ===', {
+                                sessionId: session.id,
+                                userIdFromUserObject: user.id,
+                                userIdType: typeof user.id
+                            });
+                            await auth.invalidateSession(sessionId);
+                            const blankCookie = auth.createBlankSessionCookie();
+                            event.cookies.set(blankCookie.name, blankCookie.value, { path: '/', ...blankCookie.attributes });
+                            event.locals.user = undefined; // Ensure user is not set (use undefined, not null)
+                        } else {
+                            // Set user in locals from the Lucia user object
+                            event.locals.user = {
+                                id: userIdNum, 
+                                email: user.email,
+                                role: user.role,
+                                first_name: user.first_name,
+                                last_name: user.last_name,
+                                email_verified: user.email_verified
+                            };
+                            
+                            logger.info('=== USER SESSION VALIDATED (hooks.server.ts) ===', {
+                                sessionId: session.id,
+                                userId: user.id, 
+                                parsedUserId: userIdNum,
+                                email: user.email
+                            });
                         }
+                    } else {
+                        logger.warn('=== INVALID LUCIA SESSION ===', { sessionId });
+                        
+                        // If the session is invalid, clear it
+                        if (sessionId) {
+                            await auth.invalidateSession(sessionId);
+                            const sessionCookie = auth.createBlankSessionCookie();
+                            event.cookies.set(sessionCookie.name, sessionCookie.value, {
+                                path: "/",
+                                ...sessionCookie.attributes
+                            });
+                        }
+                    }
+                } catch (error) {
+                    logger.error('=== ERROR VALIDATING LUCIA SESSION ===', {
+                        sessionId,
+                        error: error instanceof Error ? error.message : String(error),
+                        stack: error instanceof Error ? error.stack : undefined
                     });
+                    
+                    // If there was an error, clear the session
+                    if (sessionId) {
+                        try {
+                            await auth.invalidateSession(sessionId);
+                            const sessionCookie = auth.createBlankSessionCookie();
+                            event.cookies.set(sessionCookie.name, sessionCookie.value, {
+                                path: "/",
+                                ...sessionCookie.attributes
+                            });
+                        } catch (clearError) {
+                            logger.error('=== ERROR CLEARING SESSION ===', {
+                                sessionId,
+                                error: clearError instanceof Error ? clearError.message : String(clearError)
+                            });
+                        }
+                    }
                 }
             } else {
                 logger.warn('=== INVALID SESSION ID FORMAT ===', { 
-                    userId,
-                    userIdType: typeof userId,
-                    userIdLength: userId.length,
-                    rawCookie: event.cookies.get(sessionConfig.cookieName)
+                    sessionId,
+                    sessionIdType: typeof sessionId,
+                    sessionIdLength: sessionId.length
                 });
+                
+                // Clear the invalid session cookie
                 event.cookies.delete(sessionConfig.cookieName, { path: '/' });
             }
         } else {
             logger.debug('=== NO SESSION COOKIE FOUND ===', {
                 allCookies: event.cookies.getAll().map(c => ({
                     name: c.name,
-                    value: c.value
+                    value: c.value ? c.value.substring(0, 5) + '...' : null
                 }))
             });
         }
@@ -202,8 +157,7 @@ export const handle: Handle = async ({ event, resolve }) => {
             status: response.status,
             duration: `${duration}ms`,
             user: event.locals.user,
-            sessionCookie: event.cookies.get(sessionConfig.cookieName),
-            responseHeaders: Object.fromEntries(response.headers.entries())
+            sessionCookie: event.cookies.get(sessionConfig.cookieName)
         });
 
         return response;

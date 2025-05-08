@@ -1,6 +1,7 @@
 import argon2 from 'argon2';
 import { dev } from '$app/environment';
 import { logger } from '$lib/logger';
+import { auth } from './lucia';
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
@@ -28,25 +29,29 @@ export function checkRateLimit(identifier: string): boolean {
 }
 
 // Session validation
-export function validateSession(userId: string | undefined): boolean {
+export function validateSession(sessionId: string | undefined): boolean {
     logger.debug('Validating session ID', { 
-        userId,
-        userIdType: typeof userId,
-        userIdLength: userId?.length,
-        isNumeric: userId ? /^\d+$/.test(userId) : false
+        sessionId,
+        sessionIdType: typeof sessionId,
+        sessionIdLength: sessionId?.length
     });
-    if (!userId) {
-        logger.debug('No user ID provided');
+    
+    if (!sessionId) {
+        logger.debug('No session ID provided');
         return false;
     }
-    const isValid = /^\d+$/.test(userId);
+    
+    // Check if it's a valid Lucia session ID format (alphanumeric, no special chars)
+    const isValidFormat = /^[a-zA-Z0-9]+$/.test(sessionId);
+    
     logger.debug('Session ID validation result', { 
-        userId, 
-        isValid,
-        userIdType: typeof userId,
-        userIdLength: userId.length
+        sessionId, 
+        isValidFormat,
+        sessionIdType: typeof sessionId,
+        sessionIdLength: sessionId.length
     });
-    return isValid;
+    
+    return isValidFormat;
 }
 
 // Password hashing configuration
@@ -74,9 +79,13 @@ export const verifyPassword = async (hash: string, password: string): Promise<bo
     }
 };
 
-// Improve session security
+// Get Lucia's session cookie name
+const luciaCookieName = auth.sessionCookieName;
+logger.debug('Lucia session cookie name', { cookieName: luciaCookieName });
+
+// Session config
 export const sessionConfig = {
-    cookieName: 'session',
+    cookieName: luciaCookieName, // Use Lucia's cookie name
     maxAge: 7 * 24 * 60 * 60, // 7 days
     secure: !dev, // Only require HTTPS in production
     httpOnly: true,

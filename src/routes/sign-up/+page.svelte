@@ -55,6 +55,25 @@
             Or
             <a href="/sign-in" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 underline">sign in to your existing account</a>
         </p>
+
+        <div class="mt-4">
+            <a href="/login/google" 
+               class="w-full flex items-center justify-center px-8 py-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                <svg class="w-5 h-5 mr-2" aria-hidden="true" focusable="false" data-prefix="fab" data-icon="google" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512"><path fill="currentColor" d="M488 261.8C488 403.3 381.5 512 244 512 110.3 512 0 401.8 0 265.5S110.3 19 244 19c70.5 0 131.5 30.1 174.2 78.3l-66.3 57.9C333.6 131.4 291.5 111.6 244 111.6c-80.3 0-145.5 65.4-145.5 146.3s65.3 146.3 145.5 146.3c50.3 0 90.3-20.4 115.2-46.3l66.6 65.9C390.7 422.3 323.1 464 244 464c-121.2 0-219.5-98.3-219.5-219.5S122.8 46 244 46c59.7 0 113.5 23.7 151.1 61.5l61.3-57C426.6 29.3 349.1 0 244 0 109.2 0 0 109.2 0 244s109.2 244 244 244c54.8 0 103.7-18.8 140.5-49.9l-11.3-11.3C365.3 451.9 307.8 472 244 472c-107.9 0-195.5-87.6-195.5-195.5S136.1 81 244 81c66.5 0 121.7 33.5 153.8 85.8l-63.6 52.3C319.1 200.9 283.4 184 244 184c-64.3 0-116.7 52.4-116.7 116.7s52.4 116.7 116.7 116.7c42.9 0 79.2-23.3 98.3-57.5H244v-78.7h236.1c2.6 15.3 5.9 30.1 5.9 46.7z"></path></svg>
+                <span>Sign up with Google</span>
+            </a>
+        </div>
+
+        <div class="mt-4 relative">
+            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                <div class="w-full border-t border-gray-300 dark:border-gray-600"></div>
+            </div>
+            <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
+                    Or continue with email
+                </span>
+            </div>
+        </div>
     </div>
     <div class="mt-6 sm:mx-auto sm:w-full sm:max-w-md" in:fade={{ delay: 150 }}>
         <form method="POST" class="bg-white dark:bg-gray-800 border border-gray-200 rounded-2xl shadow-lg p-6 space-y-6" on:submit={handleSubmit} on:input={handleInput} autocomplete="off">

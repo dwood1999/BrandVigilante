@@ -1,10 +1,9 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
 
-  let className: string | undefined | null = undefined;
-  export { className as class };
+  export let class_name = "";
 </script>
 
-<div class={cn("flex flex-col space-y-1.5 p-6", className)} {...$$restProps}>
+<div class={cn("flex flex-col space-y-1.5 p-6", class_name)} {...$$restProps}>
   <slot />
 </div> 

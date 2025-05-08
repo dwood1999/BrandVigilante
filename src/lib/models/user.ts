@@ -14,7 +14,8 @@ const userSchema = z.object({
     role: z.enum(['user', 'admin', 'lead']).default('user'),
     first_name: z.string(),
     last_name: z.string(),
-    email_verified: z.boolean().optional()
+    email_verified: z.boolean().optional(),
+    google_user_id: z.string().optional()
 });
 
 // TypeScript type derived from the schema
@@ -36,23 +37,149 @@ export class UserModel {
     private static tableName = 'users';
 
     static async create(userData: Omit<User, 'id'>): Promise<User> {
-        const validatedData = userSchema.omit({ id: true }).parse(userData);
-        const [result] = await pool.execute(
-            `INSERT INTO ${this.tableName} (email, phone, password, role, first_name, last_name, email_verified) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [
-                validatedData.email,
-                validatedData.phone,
-                validatedData.password,
-                validatedData.role,
-                validatedData.first_name,
-                validatedData.last_name,
-                validatedData.email_verified
-            ]
-        );
-        const newUser = await this.findById((result as any).insertId);
-        if (!newUser) throw new Error('Failed to create user');
-        return newUser;
+        try {
+            logger.debug("=== USER MODEL CREATE START ===", {
+                userData: {
+                    ...userData,
+                    password: userData.password ? '[REDACTED]' : undefined
+                }
+            });
+
+            const validatedData = userSchema.omit({ id: true }).parse(userData);
+            logger.debug("=== USER DATA VALIDATED BY SCHEMA ===", {
+                validatedData: {
+                    ...validatedData,
+                    password: validatedData.password ? '[REDACTED]' : undefined
+                }
+            });
+
+            try {
+                const query = `INSERT INTO ${this.tableName} (email, phone, password, role, first_name, last_name, email_verified, google_user_id) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+                let params = [
+                    validatedData.email,
+                    validatedData.phone,
+                    validatedData.password,
+                    validatedData.role,
+                    validatedData.first_name,
+                    validatedData.last_name,
+                    validatedData.email_verified,
+                    validatedData.google_user_id
+                ];
+
+                // Ensure all undefined parameters are converted to null
+                params = params.map(p => p === undefined ? null : p);
+
+                logger.debug("=== EXECUTING USER INSERT QUERY ===", {
+                    query: query,
+                    params: {
+                        ...params.reduce((acc, val, i) => ({ ...acc, [`param${i + 1}`]: val }), {}),
+                        password: validatedData.password ? '[REDACTED]' : null
+                    }
+                });
+
+                // Get a connection from the pool
+                const connection = await pool.getConnection();
+                try {
+                    // Start transaction
+                    await connection.beginTransaction();
+                    
+                    // Log the query and params directly to console
+                    console.log('Executing SQL Query:', query);
+                    console.log('With Parameters (undefined converted to null):', params);
+
+                    // Execute the insert
+                    const [result] = await connection.execute(query, params);
+                    
+                    // Get the insert ID
+                    const insertId = (result as any).insertId;
+                    logger.debug("=== USER INSERTED INTO DATABASE ===", { insertId });
+
+                    // Try to retrieve the user
+                    const [rows] = await connection.execute(
+                        `SELECT * FROM ${this.tableName} WHERE id = ?`,
+                        [insertId]
+                    );
+                    
+                    const newUser = (rows as User[])[0];
+                    if (!newUser) {
+                        throw new Error('Failed to retrieve created user');
+                    }
+
+                    // Commit the transaction
+                    await connection.commit();
+                    
+                    logger.debug("=== USER CREATED SUCCESSFULLY ===", {
+                        userId: newUser.id,
+                        email: newUser.email
+                    });
+
+                    return newUser;
+                } catch (dbError) {
+                    // Rollback the transaction
+                    await connection.rollback();
+                    
+                    // Log the raw error immediately
+                    console.error('Raw database error:', dbError);
+                    
+                    // Log detailed error information
+                    logger.error("=== DATABASE ERROR DURING USER CREATION ===", {
+                        error: dbError instanceof Error ? dbError.message : String(dbError),
+                        stack: dbError instanceof Error ? dbError.stack : undefined,
+                        code: (dbError as any).code,
+                        errno: (dbError as any).errno,
+                        sqlState: (dbError as any).sqlState,
+                        sqlMessage: (dbError as any).sqlMessage,
+                        sql: (dbError as any).sql,
+                        errorType: dbError?.constructor?.name,
+                        errorName: dbError instanceof Error ? dbError.name : undefined,
+                        errorCause: dbError instanceof Error ? dbError.cause : undefined,
+                        // Log the actual values being inserted (excluding password)
+                        insertValues: {
+                            email: validatedData.email,
+                            phone: validatedData.phone,
+                            role: validatedData.role,
+                            first_name: validatedData.first_name,
+                            last_name: validatedData.last_name,
+                            email_verified: validatedData.email_verified,
+                            google_user_id: validatedData.google_user_id
+                        }
+                    });
+
+                    // Also log the error to stderr for immediate visibility
+                    process.stderr.write(`Database Error: ${JSON.stringify(dbError, null, 2)}\n`);
+                    
+                    throw dbError;
+                } finally {
+                    // Always release the connection
+                    connection.release();
+                }
+            } catch (error) {
+                logger.error("=== USER MODEL CREATE ERROR ===", {
+                    error: error instanceof Error ? error.message : String(error),
+                    stack: error instanceof Error ? error.stack : undefined,
+                    cause: error instanceof Error ? error.cause : undefined,
+                    name: error instanceof Error ? error.name : undefined,
+                    userData: {
+                        ...userData,
+                        password: userData.password ? '[REDACTED]' : undefined
+                    }
+                });
+                throw error;
+            }
+        } catch (error) {
+            logger.error("=== USER MODEL CREATE ERROR ===", {
+                error: error instanceof Error ? error.message : String(error),
+                stack: error instanceof Error ? error.stack : undefined,
+                cause: error instanceof Error ? error.cause : undefined,
+                name: error instanceof Error ? error.name : undefined,
+                userData: {
+                    ...userData,
+                    password: userData.password ? '[REDACTED]' : undefined
+                }
+            });
+            throw error;
+        }
     }
 
     static async findById(id: number): Promise<User | null> {
@@ -91,6 +218,14 @@ export class UserModel {
             // Re-throw the error so the action catch block can handle the user-facing response
             throw error; 
         }
+    }
+
+    static async findByGoogleId(googleId: string): Promise<User | null> {
+        const [rows] = await pool.execute(
+            `SELECT * FROM ${this.tableName} WHERE google_user_id = ?`,
+            [googleId]
+        );
+        return (rows as User[])[0] || null;
     }
 
     static async update(id: number, userData: Partial<User>): Promise<User | null> {

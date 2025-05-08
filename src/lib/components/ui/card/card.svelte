@@ -1,13 +1,12 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
 
-  let className: string | undefined | null = undefined;
-  export { className as class };
+  export let class_name = "";
 </script>
 
-<article class={cn("rounded-lg border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md", className)} {...$$restProps}>
+<div class={cn("rounded-lg border bg-card text-card-foreground shadow-sm", class_name)}>
   <slot />
-</article>
+</div>
 
 <slot name="header" />
 <slot name="content" />

@@ -1,10 +1,9 @@
 <script lang="ts">
   import { cn } from "$lib/utils";
 
-  let className: string | undefined | null = undefined;
-  export { className as class };
+  export let class_name = "";
 </script>
 
-<p class={cn("text-sm text-muted-foreground", className)} {...$$restProps}>
+<p class={cn("text-sm text-muted-foreground", class_name)}>
   <slot />
 </p> 
