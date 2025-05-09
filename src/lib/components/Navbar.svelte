@@ -51,10 +51,19 @@
     // Function to clear cookie client-side (best effort)
     function clearSessionCookieClientSide() {
         if (!browser) return;
-        const cookieName = 'session'; // Assuming 'session' is the name
+        
+        const cookieNameToClear = $page.data.cookieNameToClear;
+
+        if (!cookieNameToClear) {
+            console.warn('[Navbar] cookieNameToClear not found in $page.data. Cannot clear cookie client-side.');
+            return; 
+        }
+
         const domain = window.location.hostname;
-        document.cookie = `${cookieName}=;path=/;domain=${domain};expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax${window.location.protocol === 'https:' ? ';Secure' : ''}`;
-        console.log('[Navbar] Attempted client-side cookie clear');
+        const secureFlag = window.location.protocol === 'https:' ? ';Secure' : '';
+        
+        document.cookie = `${cookieNameToClear}=;path=/;domain=${domain};expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax${secureFlag}`;
+        console.log(`[Navbar] Attempted client-side clear for cookie: ${cookieNameToClear}`);
     }
 
     async function handleLogout() {

@@ -8,12 +8,12 @@
 	import PerformanceMonitor from '$lib/components/ui/PerformanceMonitor.svelte';
 	import { theme } from '$lib/stores/theme';
 	import { navigation } from '$lib/stores/navigation';
-	import type { LayoutData } from './$types';
+	import type { LayoutData as PageLayoutData } from './$types';
 	import { page } from '$app/stores';
 	import { fade } from 'svelte/transition';
 	import EmailVerificationBanner from '$lib/components/EmailVerificationBanner.svelte';
 
-	export const data: LayoutData = { user: null };
+	export let data: PageLayoutData;
 	
 	// Show breadcrumb only on non-home pages
 	$: showBreadcrumb = $navigation.activeRoute !== '/';

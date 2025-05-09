@@ -98,36 +98,39 @@ export const GET = async ({ url, cookies, request }) => {
             
         if (!user) {
             debugLog("USER NOT FOUND BY GOOGLE ID, CHECKING EMAIL");
-            user = await UserModel.findByEmail(googleUser.email)
-                .catch((err) => {
-                    debugLog("ERROR FINDING USER BY EMAIL", { error: String(err) });
-                    return null;
-                });
+            try {
+                user = await UserModel.findByEmail(googleUser.email);
                 
-            if (user) {
-                debugLog("USER FOUND BY EMAIL, UPDATING GOOGLE ID");
-                // Fix linter error - ensure id is not undefined
-                if (user.id !== undefined) {
-                    await UserModel.update(user.id, {
-                        google_user_id: googleUser.sub
-                    });
-                    debugLog("UPDATED USER WITH GOOGLE ID", { userId: user.id });
+                if (user) {
+                    debugLog("USER FOUND BY EMAIL, UPDATING GOOGLE ID");
+                    // Update existing user with Google ID
+                    if (user.id) {
+                        await UserModel.update(user.id, {
+                            google_user_id: googleUser.sub,
+                            email_verified: true // Since they verified with Google
+                        });
+                        debugLog("UPDATED USER WITH GOOGLE ID", { userId: user.id });
+                    } else {
+                        debugLog("USER ID IS UNDEFINED, CANNOT UPDATE");
+                        return redirect(303, "/login?error=invalid_user");
+                    }
                 } else {
-                    debugLog("USER ID IS UNDEFINED");
+                    debugLog("NO USER FOUND, CREATING NEW USER");
+                    // Create new user
+                    user = await UserModel.create({
+                        email: googleUser.email,
+                        first_name: googleUser.given_name || "",
+                        last_name: googleUser.family_name || "",
+                        role: "user",
+                        email_verified: true, // Since they verified with Google
+                        google_user_id: googleUser.sub,
+                        password: ""
+                    });
+                    debugLog("NEW USER CREATED", { userId: user.id });
                 }
-            } else {
-                debugLog("NO USER FOUND, CREATING NEW USER");
-                // Create new user
-                user = await UserModel.create({
-                    email: googleUser.email,
-                    first_name: googleUser.given_name || "",
-                    last_name: googleUser.family_name || "",
-                    role: "user",
-                    email_verified: googleUser.email_verified || false,
-                    google_user_id: googleUser.sub,
-                    password: ""
-                });
-                debugLog("NEW USER CREATED", { userId: user.id });
+            } catch (error) {
+                debugLog("ERROR IN USER LOOKUP/CREATION", { error: String(error) });
+                return redirect(303, "/login?error=user_creation_failed");
             }
         } else {
             debugLog("USER FOUND BY GOOGLE ID", { userId: user.id });
