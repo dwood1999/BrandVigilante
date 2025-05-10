@@ -13,10 +13,14 @@
 
     interface FormErrors {
         error?: string;
+        success?: boolean;
+        message?: string;
         fieldErrors?: {
             name?: string;
+            display_name?: string;
             url?: string;
             description?: string;
+            status?: string;
         };
     }
 
@@ -24,11 +28,21 @@
     export let form: FormErrors;
     
     let loading = false;
-    let name = data.brand.name;
+    let name = data.brand.name || '';
+    let display_name = data.brand.display_name || '';
     let url = data.brand.url || '';
     let description = data.brand.description || '';
+    let status = data.brand.status || 'active';
+    let formError: string | null = form?.error || null;
+    let formSuccess: string | null = form?.success ? form.message || 'Brand updated successfully!' : null;
 
-    $: isValid = name.trim().length > 0;
+    function handleInput(event: Event) {
+        formError = null;
+        formSuccess = null;
+    }
+
+    // Only validate if the fields have been modified
+    $: isValid = true;
 </script>
 
 <svelte:head>
@@ -61,22 +75,36 @@
                     method="POST"
                     action="?/update"
                     class="space-y-6"
+                    on:input={handleInput}
                     use:enhance={() => {
                         loading = true;
                         return async ({ result }) => {
                             loading = false;
                             if (result.type === 'success') {
-                                window.location.href = '/admin/brands';
+                                formSuccess = result.data?.message || 'Brand updated successfully!';
+                                formError = null;
                             }
                         };
                     }}
                 >
-                    {#if form?.error}
+                    {#if formError}
                         <div class="rounded-md bg-red-50 p-4">
                             <div class="flex">
                                 <div class="ml-3">
                                     <h3 class="text-sm font-medium text-red-800">
-                                        {form.error}
+                                        {formError}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+
+                    {#if formSuccess}
+                        <div class="rounded-md bg-green-50 p-4">
+                            <div class="flex">
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-green-800">
+                                        {formSuccess}
                                     </h3>
                                 </div>
                             </div>
@@ -100,6 +128,25 @@
                             </div>
                             {#if form?.fieldErrors?.name}
                                 <p class="mt-2 text-sm text-red-600">{form.fieldErrors.name}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label for="display_name" class="block text-sm font-medium leading-6 text-gray-900">
+                                Display Name
+                            </label>
+                            <div class="mt-2">
+                                <input
+                                    type="text"
+                                    name="display_name"
+                                    id="display_name"
+                                    bind:value={display_name}
+                                    required
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            {#if form?.fieldErrors?.display_name}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.display_name}</p>
                             {/if}
                         </div>
 
@@ -138,21 +185,39 @@
                                 <p class="mt-2 text-sm text-red-600">{form.fieldErrors.description}</p>
                             {/if}
                         </div>
+
+                        <div>
+                            <label for="status" class="block text-sm font-medium leading-6 text-gray-900">
+                                Status
+                            </label>
+                            <div class="mt-2">
+                                <select
+                                    name="status"
+                                    id="status"
+                                    bind:value={status}
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                >
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            {#if form?.fieldErrors?.status}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.status}</p>
+                            {/if}
+                        </div>
                     </div>
 
-                    <div class="flex justify-end gap-x-3">
-                        <a
-                            href="/admin/brands"
-                            class="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                        >
-                            Cancel
-                        </a>
+                    <div class="mt-6 flex justify-end">
                         <button
                             type="submit"
                             disabled={!isValid || loading}
                             class="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Saving...' : 'Save Changes'}
+                            {#if loading}
+                                Saving...
+                            {:else}
+                                Save Changes
+                            {/if}
                         </button>
                     </div>
                 </form>

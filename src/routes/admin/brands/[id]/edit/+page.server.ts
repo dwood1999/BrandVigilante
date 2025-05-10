@@ -1,7 +1,7 @@
-import { redirect, fail } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { BrandModel } from '../../../../../lib/models/brand';
-import { logger } from '../../../../../lib/logger';
+import { BrandModel } from '$lib/models/brand';
+import { logger } from '$lib/logger';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     if (!locals.user || locals.user.role !== 'admin') {
@@ -10,26 +10,19 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
     const brandId = parseInt(params.id);
     if (isNaN(brandId)) {
-        throw redirect(302, '/admin/brands');
+        throw error(404, 'Brand not found');
     }
 
-    try {
-        const brand = await BrandModel.findById(brandId);
-        if (!brand) {
-            throw redirect(302, '/admin/brands');
-        }
-
-        return {
-            brand
-        };
-    } catch (error) {
-        logger.error('Error loading brand:', error);
-        throw redirect(302, '/admin/brands');
+    const brand = await BrandModel.findById(brandId);
+    if (!brand) {
+        throw error(404, 'Brand not found');
     }
+
+    return { brand };
 };
 
 export const actions: Actions = {
-    default: async ({ request, params }) => {
+    update: async ({ request, params }) => {
         const brandId = parseInt(params.id);
         if (isNaN(brandId)) {
             return fail(400, { error: 'Invalid brand ID' });
@@ -37,28 +30,64 @@ export const actions: Actions = {
 
         const formData = await request.formData();
         const name = formData.get('name')?.toString().trim();
+        const display_name = formData.get('display_name')?.toString().trim();
         const url = formData.get('url')?.toString().trim();
         const description = formData.get('description')?.toString().trim();
+        const status = formData.get('status')?.toString() as 'active' | 'inactive';
 
         if (!name) {
-            return fail(400, { error: 'Brand name is required' });
+            return fail(400, { 
+                error: 'Brand name is required',
+                fieldErrors: {
+                    name: 'Brand name is required'
+                }
+            });
+        }
+
+        if (!display_name) {
+            return fail(400, { 
+                error: 'Display name is required',
+                fieldErrors: {
+                    display_name: 'Display name is required'
+                }
+            });
         }
 
         if (url && !isValidUrl(url)) {
-            return fail(400, { error: 'Please enter a valid URL' });
+            return fail(400, { 
+                error: 'Please enter a valid URL',
+                fieldErrors: {
+                    url: 'Please enter a valid URL'
+                }
+            });
         }
 
         try {
-            await BrandModel.update(brandId, {
+            const brand = await BrandModel.update(brandId, {
                 name,
-                url: url || undefined,
-                description: description || undefined
+                display_name,
+                url: url || null,
+                description: description || null,
+                status: status || 'active'
             });
 
-            return { success: true };
+            return { 
+                success: true,
+                message: 'Brand updated successfully!',
+                data: brand
+            };
         } catch (error) {
             logger.error('Error updating brand:', error);
-            return fail(500, { error: 'Failed to update brand' });
+            return fail(500, { 
+                error: 'Failed to update brand',
+                data: {
+                    name,
+                    display_name,
+                    url,
+                    description,
+                    status
+                }
+            });
         }
     }
 };
