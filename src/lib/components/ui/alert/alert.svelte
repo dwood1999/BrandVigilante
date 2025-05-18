@@ -7,7 +7,7 @@
 
     const variants = {
         default: "bg-background text-foreground",
-        destructive: "destructive border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive"
+        destructive: "destructive border-destructive/50 text-destructive [&>svg]:text-destructive"
     };
 
     const icons = {

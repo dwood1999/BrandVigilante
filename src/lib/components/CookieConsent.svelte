@@ -80,27 +80,27 @@
 
 {#if showBanner}
 	<div
-		class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg z-50 p-4"
+		class="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50 p-4"
 		transition:fade
 	>
 		<div class="container mx-auto max-w-6xl">
 			<div class="flex flex-col md:flex-row items-center justify-between gap-4">
 				<div class="flex-1">
 					<h3 class="text-lg font-semibold mb-2">Cookie Consent</h3>
-					<p class="text-gray-600 dark:text-gray-400">
+					<p class="text-gray-600">
 						We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking "Accept All", you consent to our use of cookies.
 					</p>
 				</div>
 				<div class="flex flex-col sm:flex-row gap-2">
 					<button
 						on:click={() => (showModal = true)}
-						class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+						class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
 					>
 						Customize
 					</button>
 					<button
 						on:click={acceptNecessary}
-						class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+						class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
 					>
 						Necessary Only
 					</button>
@@ -119,24 +119,40 @@
 {#if showModal}
 	<div
 		class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-		on:click={() => (showModal = false)}
+		role="dialog"
+		aria-modal="true"
+		aria-label="Cookie preferences"
+		tabindex="-1"
 		transition:fade
 	>
 		<div
-			class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full p-6"
-			on:click|stopPropagation
+			class="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6"
+			role="document"
+			aria-label="Cookie preferences content"
 			transition:slide={{ duration: 200 }}
 		>
-			<h2 class="text-2xl font-bold mb-4">Cookie Preferences</h2>
-			<p class="text-gray-600 dark:text-gray-400 mb-6">
+			<div class="flex justify-between items-start mb-4">
+				<h2 class="text-2xl font-bold">Cookie Preferences</h2>
+				<button
+					type="button"
+					class="text-gray-500 hover:text-gray-700"
+					on:click={() => (showModal = false)}
+					aria-label="Close cookie preferences"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+			<p class="text-gray-600 mb-6">
 				Manage your cookie preferences. You can enable or disable different types of cookies below.
 			</p>
 
 			<div class="space-y-4">
-				<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+				<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
 					<div>
 						<h3 class="font-semibold">Necessary Cookies</h3>
-						<p class="text-sm text-gray-600 dark:text-gray-400">
+						<p class="text-sm text-gray-600">
 							Essential for the website to function properly. Cannot be disabled.
 						</p>
 					</div>
@@ -153,10 +169,10 @@
 					</label>
 				</div>
 
-				<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+				<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
 					<div>
 						<h3 class="font-semibold">Analytics Cookies</h3>
-						<p class="text-sm text-gray-600 dark:text-gray-400">
+						<p class="text-sm text-gray-600">
 							Help us understand how visitors interact with our website.
 						</p>
 					</div>
@@ -173,10 +189,10 @@
 					</label>
 				</div>
 
-				<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+				<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
 					<div>
 						<h3 class="font-semibold">Marketing Cookies</h3>
-						<p class="text-sm text-gray-600 dark:text-gray-400">
+						<p class="text-sm text-gray-600">
 							Used to track visitors across websites for marketing purposes.
 						</p>
 					</div>
@@ -193,10 +209,10 @@
 					</label>
 				</div>
 
-				<div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+				<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
 					<div>
 						<h3 class="font-semibold">Preference Cookies</h3>
-						<p class="text-sm text-gray-600 dark:text-gray-400">
+						<p class="text-sm text-gray-600">
 							Remember your settings and preferences for a better experience.
 						</p>
 					</div>
@@ -216,12 +232,14 @@
 
 			<div class="mt-6 flex justify-end gap-4">
 				<button
+					type="button"
 					on:click={() => (showModal = false)}
-					class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+					class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
 				>
 					Cancel
 				</button>
 				<button
+					type="button"
 					on:click={() => {
 						saveConsent();
 						showModal = false;

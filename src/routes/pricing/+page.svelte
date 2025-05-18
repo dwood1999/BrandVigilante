@@ -57,19 +57,19 @@ import SignupForm from "$lib/components/SignupForm.svelte";
                     buttonText: "Contact Sales"
                 }
             ] as plan}
-                <div class="bg-card dark:bg-card/50 rounded-lg p-8 shadow-md border border-border">
+                <div class="bg-card rounded-lg p-8 shadow-md border border-border">
                     <h3 class="text-2xl font-bold mb-4 text-foreground">{plan.name}</h3>
-                    <div class="text-4xl font-bold mb-6 text-lime-600 dark:text-lime-400">{plan.price}<span class="text-lg text-muted-foreground">/month</span></div>
+                    <div class="text-4xl font-bold mb-6 text-lime-600">{plan.price}<span class="text-lg text-muted-foreground">/month</span></div>
                     <ul class="space-y-4 mb-8 text-muted-foreground">
                         {#each plan.features as feature}
                             <li class="flex items-start">
-                                <span class="mr-3 text-lime-600 dark:text-lime-400">•</span>
+                                <span class="mr-3 text-lime-600">•</span>
                                 <span>{feature}</span>
                             </li>
                         {/each}
                     </ul>
                     <SignupForm>
-                        <Button class="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
+                        <Button class="w-full bg-lime-600 hover:bg-lime-700 text-white">
                             {plan.buttonText}
                         </Button>
                     </SignupForm>

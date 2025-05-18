@@ -38,18 +38,18 @@
 
 {#if showMonitor}
     <div class="fixed bottom-4 right-4 z-50 transition-all duration-300 ease-in-out {isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}">
-        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-md">
+        <div class="bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-md">
             <div class="flex justify-between items-center mb-2">
                 <h3 class="text-sm font-semibold">Performance Metrics</h3>
                 <div class="flex gap-2">
                     <button 
-                        class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 transition-colors"
                         on:click={() => isExpanded = !isExpanded}
                     >
                         {isExpanded ? 'Collapse' : 'Expand'}
                     </button>
                     <button 
-                        class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        class="text-xs px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 transition-colors"
                         on:click={toggleVisibility}
                     >
                         {isVisible ? 'Hide' : 'Show'}

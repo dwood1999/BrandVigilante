@@ -8,13 +8,21 @@
     export let form: ActionData;
     
     let loading = false;
+    let formError: string | null = form?.error || null;
+    let formSuccess: string | null = form?.success ? form.message || 'Term updated successfully!' : null;
+
+    function handleInput(event: Event) {
+        formError = null;
+        formSuccess = null;
+    }
 
     const handleSubmit = () => {
         loading = true;
         return async ({ result }) => {
             loading = false;
             if (result.type === 'success') {
-                window.location.href = '/admin/terms';
+                formSuccess = result.data?.message || 'Term updated successfully!';
+                formError = null;
             }
         };
     };
@@ -55,6 +63,7 @@
                         brand_id: data.term.brand_id
                     }}
                     onSubmit={handleSubmit}
+                    onInput={handleInput}
                 />
             </div>
         </div>

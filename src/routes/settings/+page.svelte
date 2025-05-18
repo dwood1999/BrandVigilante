@@ -16,10 +16,10 @@
 >
     <div class="space-y-8">
         <!-- Profile Settings -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Profile Settings</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h2 class="text-lg font-medium text-gray-900">Profile Settings</h2>
+                <p class="mt-1 text-sm text-gray-500">
                     Update your personal information and profile settings.
                 </p>
                 <form
@@ -41,7 +41,7 @@
                 >
                     <div class="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
                         <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="first_name" class="block text-sm font-medium text-gray-700">
                                 First Name
                             </label>
                             <input
@@ -50,12 +50,12 @@
                                 id="first_name"
                                 value={user?.first_name || ''}
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
 
                         <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="last_name" class="block text-sm font-medium text-gray-700">
                                 Last Name
                             </label>
                             <input
@@ -64,12 +64,12 @@
                                 id="last_name"
                                 value={user?.last_name || ''}
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="email" class="block text-sm font-medium text-gray-700">
                                 Email
                             </label>
                             <input
@@ -78,19 +78,19 @@
                                 id="email"
                                 value={user?.email || ''}
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
 
                     {#if error}
-                        <div class="text-red-600 dark:text-red-400 text-sm">
+                        <div class="text-red-600 text-sm">
                             {error}
                         </div>
                     {/if}
 
                     {#if success}
-                        <div class="text-green-600 dark:text-green-400 text-sm">
+                        <div class="text-green-600 text-sm">
                             Profile updated successfully!
                         </div>
                     {/if}
@@ -113,10 +113,10 @@
         </div>
 
         <!-- Password Settings -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Password Settings</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h2 class="text-lg font-medium text-gray-900">Password Settings</h2>
+                <p class="mt-1 text-sm text-gray-500">
                     Update your password to keep your account secure.
                 </p>
                 <form
@@ -138,7 +138,7 @@
                 >
                     <div class="space-y-6">
                         <div>
-                            <label for="current_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="current_password" class="block text-sm font-medium text-gray-700">
                                 Current Password
                             </label>
                             <input
@@ -146,12 +146,12 @@
                                 name="current_password"
                                 id="current_password"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
 
                         <div>
-                            <label for="new_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="new_password" class="block text-sm font-medium text-gray-700">
                                 New Password
                             </label>
                             <input
@@ -160,12 +160,12 @@
                                 id="new_password"
                                 required
                                 minlength="8"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
 
                         <div>
-                            <label for="confirm_password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-700">
                                 Confirm New Password
                             </label>
                             <input
@@ -174,7 +174,7 @@
                                 id="confirm_password"
                                 required
                                 minlength="8"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white sm:text-sm"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                             />
                         </div>
                     </div>
@@ -197,10 +197,10 @@
         </div>
 
         <!-- Notification Settings -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="bg-white shadow rounded-lg overflow-hidden">
             <div class="p-6">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Notification Settings</h2>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <h2 class="text-lg font-medium text-gray-900">Notification Settings</h2>
+                <p class="mt-1 text-sm text-gray-500">
                     Choose how you want to receive notifications.
                 </p>
                 <form
@@ -231,10 +231,10 @@
                                 />
                             </div>
                             <div class="ml-3">
-                                <label for="email_notifications" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label for="email_notifications" class="text-sm font-medium text-gray-700">
                                     Email Notifications
                                 </label>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                <p class="text-sm text-gray-500">
                                     Receive notifications about important updates and activity via email.
                                 </p>
                             </div>
@@ -250,10 +250,10 @@
                                 />
                             </div>
                             <div class="ml-3">
-                                <label for="browser_notifications" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                <label for="browser_notifications" class="text-sm font-medium text-gray-700">
                                     Browser Notifications
                                 </label>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                <p class="text-sm text-gray-500">
                                     Receive notifications in your browser when you're online.
                                 </p>
                             </div>

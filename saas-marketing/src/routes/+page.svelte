@@ -21,7 +21,7 @@
                 </p>
                 <div class="flex gap-4">
                     <SignupForm>
-                        <Button size="lg" class="bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600">
+                        <Button size="lg" class="bg-lime-600 hover:bg-lime-700">
                             Get Started
                         </Button>
                     </SignupForm>
@@ -93,19 +93,19 @@
     </section>
 
     <!-- Stats Section -->
-    <section class="bg-card dark:bg-card/50 py-16">
+    <section class="bg-card py-16">
         <div class="container mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                 <div>
-                    <div class="text-4xl font-bold text-lime-600 dark:text-lime-400 mb-2">164%</div>
+                    <div class="text-4xl font-bold text-lime-600 mb-2">164%</div>
                     <p class="text-muted-foreground">Increase in Digital Threats (2023)</p>
                 </div>
                 <div>
-                    <div class="text-4xl font-bold text-lime-600 dark:text-lime-400 mb-2">700+</div>
+                    <div class="text-4xl font-bold text-lime-600 mb-2">700+</div>
                     <p class="text-muted-foreground">Global Disruption Partners</p>
                 </div>
                 <div>
-                    <div class="text-4xl font-bold text-lime-600 dark:text-lime-400 mb-2">24/7</div>
+                    <div class="text-4xl font-bold text-lime-600 mb-2">24/7</div>
                     <p class="text-muted-foreground">Continuous Brand Monitoring</p>
                 </div>
             </div>
@@ -117,22 +117,23 @@
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12 text-foreground">Comprehensive Brand Protection</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="p-6 bg-card dark:bg-card/50 rounded-lg shadow-sm border border-border">
+                <div class="p-6 bg-card rounded-lg shadow-sm border border-border">
                     <h3 class="text-xl font-semibold mb-4 text-foreground">AI-Powered Detection</h3>
                     <p class="text-muted-foreground">Advanced algorithms analyze millions of data points to identify brand threats and impersonation attempts.</p>
                 </div>
-                <div class="p-6 bg-card dark:bg-card/50 rounded-lg shadow-sm border border-border">
+                <div class="p-6 bg-card rounded-lg shadow-sm border border-border">
                     <h3 class="text-xl font-semibold mb-4 text-foreground">Real-Time Monitoring</h3>
                     <p class="text-muted-foreground">24/7 surveillance across surface, deep, and dark web to protect your brand assets and reputation.</p>
                 </div>
-                <div class="p-6 bg-card dark:bg-card/50 rounded-lg shadow-sm border border-border">
+                <div class="p-6 bg-card rounded-lg shadow-sm border border-border">
                     <h3 class="text-xl font-semibold mb-4 text-foreground">Automated Response</h3>
                     <p class="text-muted-foreground">Swift takedown of malicious content and automated threat mitigation to minimize brand damage.</p>
                 </div>
-                <div class="p-6 bg-card dark:bg-card/50 rounded-lg shadow-sm border border-border">
+                <div class="p-6 bg-card rounded-lg shadow-sm border border-border">
                     <h3 class="text-xl font-semibold mb-4 text-foreground">Risk Analytics</h3>
                     <p class="text-muted-foreground">Data-driven insights and risk scoring to prioritize threats and optimize protection strategies.</p>
                 </div>
+                <div class="p-6 bg-card rounded-lg shadow-sm border border-border">
                 <div class="p-6 bg-card dark:bg-card/50 rounded-lg shadow-sm border border-border">
                     <h3 class="text-xl font-semibold mb-4 text-foreground">Global Coverage</h3>
                     <p class="text-muted-foreground">Comprehensive protection across all digital channels and platforms worldwide.</p>

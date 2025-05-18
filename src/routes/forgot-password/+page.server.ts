@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { logger } from '$lib/logger';
 import { dev } from '$app/environment';
 import { sendEmail } from '$lib/email';
+import { env } from '$env/dynamic/private';
 
 // Schema for forgot password
 const ForgotPasswordSchema = z.object({
@@ -40,7 +41,7 @@ export const actions: Actions = {
                 const resetToken = await UserModel.createPasswordResetToken(user.id.toString());
                 
                 // Send reset email
-                const resetUrl = `${process.env.ORIGIN || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+                const resetUrl = `${env.ORIGIN}/reset-password?token=${resetToken}`;
                 const emailContent = `
                     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                         <h2 style="color: #1a56db;">Reset Your Password</h2>

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import bcrypt from 'bcryptjs';
+import argon2 from 'argon2';
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
@@ -8,10 +8,30 @@ const MAX_ATTEMPTS = 5;
 // Track login attempts
 const loginAttempts = new Map<string, { count: number; timestamp: number }>();
 
+// Password hashing configuration
+const hashingConfig: argon2.Options = {
+    memoryCost: 2 ** 16,
+    timeCost: 3,
+    parallelism: 1,
+    type: argon2.argon2id
+};
+
 // Password hashing function
 export async function hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
+    return await argon2.hash(password, hashingConfig);
+}
+
+// Password verification function
+export async function verifyPassword(hash: string, password: string): Promise<boolean> {
+    if (!hash?.trim() || !password?.trim()) {
+        return false;
+    }
+    try {
+        return await argon2.verify(hash, password, hashingConfig);
+    } catch (error) {
+        console.error('Password verification error:', error);
+        return false;
+    }
 }
 
 // Rate limiting function

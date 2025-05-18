@@ -3,19 +3,19 @@
 </script>
 
 <svelte:head>
-	<title>Accessibility Statement | BrandVigilante</title>
-	<meta name="description" content="BrandVigilante's Accessibility Statement - Learn about our commitment to making our website accessible to all users." />
+	<title>Accessibility Statement | JanusIPM</title>
+	<meta name="description" content="JanusIPM's Accessibility Statement - Learn about our commitment to making our website accessible to all users." />
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 	<h1 class="text-3xl font-bold mb-8">Accessibility Statement</h1>
 	
-	<div class="prose dark:prose-invert max-w-none">
-		<p class="text-gray-600 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+	<div class="prose max-w-none">
+		<p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">Our Commitment to Accessibility</h2>
-			<p>BrandVigilante is committed to ensuring digital accessibility for people of all abilities. We strive to continually improve the user experience for everyone and apply relevant accessibility standards.</p>
+			<p>JanusIPM is committed to ensuring digital accessibility for people of all abilities. We strive to continually improve the user experience for everyone and apply relevant accessibility standards.</p>
 		</section>
 
 		<section class="mb-8">
@@ -58,7 +58,7 @@
 			<h2 class="text-2xl font-semibold mb-4">Feedback and Contact Information</h2>
 			<p>We welcome your feedback on the accessibility of our website. If you encounter any accessibility barriers or have suggestions for improvement, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>By email: accessibility@brandvigilante.com</li>
+				<li>By email: accessibility@janusipm.com</li>
 				<li>By phone: (555) 123-4567</li>
 				<li>By visiting the contact page on our website</li>
 			</ul>

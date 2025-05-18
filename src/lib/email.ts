@@ -1,45 +1,66 @@
-import { dev } from '$app/environment';
 import { logger } from '$lib/logger';
+import { env } from '$env/dynamic/private';
 
 interface EmailOptions {
     to: string;
     subject: string;
     html: string;
+    from?: string;
 }
 
-export async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> {
+export async function sendEmail({ to, subject, html, from }: EmailOptions): Promise<boolean> {
     try {
         // Use dynamic import for nodemailer
         const { default: nodemailer } = await import('nodemailer');
         
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
-            },
-            tls: {
-                // Do not fail on invalid certs
-                rejectUnauthorized: false
+        // Log email attempt with full configuration
+        logger.info('Attempting to send email:', { 
+            to, 
+            subject,
+            smtpConfig: {
+                host: env.SMTP_HOST,
+                port: env.SMTP_PORT,
+                user: env.SMTP_USER,
+                from: env.SMTP_FROM
             }
         });
 
-        if (dev) {
-            logger.info('Email would be sent:', {
-                to,
-                subject,
-                html
+        // Check SMTP configuration
+        if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS) {
+            logger.error('SMTP configuration missing:', {
+                hasHost: !!env.SMTP_HOST,
+                hasUser: !!env.SMTP_USER,
+                hasPass: !!env.SMTP_PASS,
+                hasFrom: !!env.SMTP_FROM
             });
-            // Still send in dev if SMTP is configured
-            if (!process.env.SMTP_HOST) {
-                return true;
-            }
+            return false;
+        }
+
+        const transporter = nodemailer.createTransport({
+            host: env.SMTP_HOST,
+            port: parseInt(env.SMTP_PORT || '587'),
+            secure: false,
+            auth: {
+                user: env.SMTP_USER,
+                pass: env.SMTP_PASS
+            },
+            tls: {
+                rejectUnauthorized: false
+            },
+            debug: true // Enable debug logging
+        });
+
+        // Verify SMTP connection
+        try {
+            await transporter.verify();
+            logger.info('SMTP connection verified successfully');
+        } catch (verifyError) {
+            logger.error('SMTP connection verification failed:', verifyError);
+            return false;
         }
 
         const info = await transporter.sendMail({
-            from: process.env.SMTP_USER,
+            from: from || env.SMTP_FROM || env.SMTP_USER,
             to,
             subject,
             html
@@ -48,7 +69,15 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
         logger.info('Email sent successfully:', info.messageId);
         return true;
     } catch (error) {
-        logger.error('Email sending failed:', error);
+        // Enhanced error logging
+        logger.error('Email sending failed:', {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            code: error instanceof Error ? (error as any).code : undefined,
+            command: error instanceof Error ? (error as any).command : undefined,
+            responseCode: error instanceof Error ? (error as any).responseCode : undefined,
+            response: error instanceof Error ? (error as any).response : undefined
+        });
         return false;
     }
 }

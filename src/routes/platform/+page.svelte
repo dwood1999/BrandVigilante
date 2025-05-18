@@ -136,8 +136,8 @@
                                 <div class="space-y-6 text-muted-foreground">
                                     <p class="text-lg leading-relaxed">{service.description}</p>
                                     {#if service.stats}
-                                        <div class="bg-accent/50 dark:bg-accent/20 rounded-lg p-6 border border-accent">
-                                            <div class="text-4xl font-bold text-lime-600 dark:text-lime-400 mb-1">{service.stats.value}</div>
+                                        <div class="bg-accent/50 rounded-lg p-6 border border-accent">
+                                            <div class="text-4xl font-bold text-lime-600 mb-1">{service.stats.value}</div>
                                             <div class="text-sm text-muted-foreground">{service.stats.label}</div>
                                             <div class="text-xs text-muted-foreground/70 mt-1">Based on {service.stats.year} data</div>
                                         </div>
@@ -145,7 +145,7 @@
                                     <ul class="space-y-3">
                                         {#each service.features as feature}
                                             <li class="flex items-start group">
-                                                <span class="mr-3 text-lime-600 dark:text-lime-400 group-hover:text-lime-700 dark:group-hover:text-lime-300 transition-colors">•</span>
+                                                <span class="mr-3 text-lime-600 group-hover:text-lime-700 transition-colors">•</span>
                                                 <span class="group-hover:text-foreground transition-colors">{feature}</span>
                                             </li>
                                         {/each}
@@ -153,8 +153,8 @@
                                 </div>
                             </div>
                             <div class="flex-1 flex justify-end">
-                                <div class="bg-card dark:bg-card/50 rounded-lg p-8 w-full max-w-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-                                    <div class="absolute inset-0 bg-gradient-to-br from-lime-50/50 dark:from-lime-900/20 to-transparent opacity-50"></div>
+                                <div class="bg-card rounded-lg p-8 w-full max-w-xl shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-lime-50/50 to-transparent opacity-50"></div>
                                     <svg class="w-full h-auto relative z-10" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         {@html service.svg}
                                     </svg>
@@ -167,7 +167,7 @@
         </section>
 
         <!-- Pricing Section -->
-        <section class="py-20 bg-muted/50 dark:bg-muted/20">
+        <section class="py-20 bg-muted/50">
             <div class="container mx-auto px-4">
                 <h2 class="text-4xl font-bold text-center mb-12 text-foreground">Choose Your Plan</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -215,19 +215,19 @@
                             buttonText: "Contact Sales"
                         }
                     ] as plan, i}
-                        <div class={`bg-card dark:bg-card/50 rounded-lg p-8 shadow-md border border-border ${plan.isHighlighted ? 'transform scale-105 border-accent' : ''}`}>
+                        <div class={`bg-card rounded-lg p-8 shadow-md border border-border ${plan.isHighlighted ? 'transform scale-105 border-accent' : ''}`}>
                             <h3 class="text-2xl font-bold mb-4 text-foreground">{plan.name}</h3>
-                            <div class="text-4xl font-bold mb-6 text-lime-600 dark:text-lime-400">{plan.price}<span class="text-lg text-muted-foreground">/month</span></div>
+                            <div class="text-4xl font-bold mb-6 text-lime-600">{plan.price}<span class="text-lg text-muted-foreground">/month</span></div>
                             <ul class="space-y-4 mb-8 text-muted-foreground">
                                 {#each plan.features as feature}
                                     <li class="flex items-start">
-                                        <span class="mr-3 text-lime-600 dark:text-lime-400">•</span>
+                                        <span class="mr-3 text-lime-600">•</span>
                                         <span>{feature}</span>
                                     </li>
                                 {/each}
                             </ul>
                             <SignupForm>
-                                <Button class="w-full bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
+                                <Button class="w-full bg-lime-600 hover:bg-lime-700 text-white">
                                     {plan.buttonText}
                                 </Button>
                             </SignupForm>
@@ -245,7 +245,7 @@
                     Schedule a demo to see how our platform can safeguard your brand across all digital channels.
                 </p>
                 <SignupForm>
-                    <Button size="lg" class="bg-lime-600 hover:bg-lime-700 dark:bg-lime-500 dark:hover:bg-lime-600 text-white">
+                    <Button size="lg" class="bg-lime-600 hover:bg-lime-700 text-white">
                         Get More Information
                     </Button>
                 </SignupForm>

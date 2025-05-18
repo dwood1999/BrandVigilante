@@ -33,7 +33,7 @@ export const load: PageLoad = async () => {
     return {
         features,
         meta: {
-            title: 'BrandVigilante - IP Management Solutions',
+            title: 'JanusIPM - IP Management Solutions',
             description: 'Advanced intellectual property management and protection services'
         }
     };

@@ -56,7 +56,7 @@
         >
             <a 
                 href="/" 
-                class="inline-flex items-center py-2 min-h-[44px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                class="inline-flex items-center py-2 min-h-[44px] text-gray-500 hover:text-gray-700 transition-colors duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 itemprop="item"
                 aria-label="Home"
             >
@@ -89,7 +89,7 @@
                 </svg>
                 {#if segment.isLast}
                     <span 
-                        class="inline-flex items-center py-2 min-h-[44px] text-gray-900 dark:text-gray-100 font-medium px-1 rounded-md"
+                        class="inline-flex items-center py-2 min-h-[44px] text-gray-900 font-medium px-1 rounded-md"
                         aria-current="page"
                         itemprop="name"
                     >
@@ -98,7 +98,7 @@
                 {:else}
                     <a 
                         href={segment.path} 
-                        class="inline-flex items-center py-2 min-h-[44px] text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 transition-colors duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        class="inline-flex items-center py-2 min-h-[44px] text-gray-500 hover:text-gray-700 transition-colors duration-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         itemprop="item"
                     >
                         <span itemprop="name">

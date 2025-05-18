@@ -42,9 +42,9 @@
   
   // Determine input classes based on props
   $: inputClasses = `
-    block w-full rounded-md shadow-sm min-h-[44px] px-3 py-2
-    ${error ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500'}
-    ${disabled ? 'bg-gray-100 cursor-not-allowed dark:bg-gray-600' : 'bg-white dark:bg-gray-700'}
+    block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm
+    ${error ? 'border-red-300 text-red-900 placeholder-red-300 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500'}
+    ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
     ${icon ? (iconPosition === 'left' ? 'pl-10' : 'pr-10') : ''}
     ${class_}
   `;

@@ -24,8 +24,8 @@ import { Button } from '$lib/components/ui/button';
                     <li>Legal support for persistent violators</li>
                 </ul>
                 <div class="mt-8">
-                    <div class="bg-accent/50 dark:bg-accent/20 rounded-lg p-6 border border-accent inline-block">
-                        <div class="text-4xl font-bold text-lime-600 dark:text-lime-400 mb-1">100K+</div>
+                    <div class="bg-accent/50 rounded-lg p-6 border border-accent inline-block">
+                        <div class="text-4xl font-bold text-lime-600 mb-1">100K+</div>
                         <div class="text-sm text-muted-foreground">Counterfeit Listings Removed</div>
                         <div class="text-xs text-muted-foreground/70 mt-1">Based on 2023 data</div>
                     </div>

@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { z } from 'zod';
 import { logger } from '$lib/logger';
+import { sendEmail } from '$lib/email';
 
 // Contact form schema
 const contactSchema = z.object({
@@ -27,9 +28,28 @@ export const actions = {
                 timestamp: new Date().toISOString()
             });
 
-            // TODO: Send email notification
-            // For now, just simulate a delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Send notification email to admin
+            const emailSent = await sendEmail({
+                to: 'cbreaux@janusipm.com',
+                subject: `New Contact Form Submission: ${validatedData.subject}`,
+                html: `
+                    <p>A new contact form submission has been received:</p>
+                    <ul>
+                        <li><strong>Name:</strong> ${validatedData.name}</li>
+                        <li><strong>Email:</strong> ${validatedData.email}</li>
+                        <li><strong>Subject:</strong> ${validatedData.subject}</li>
+                        <li><strong>Message:</strong> ${validatedData.message}</li>
+                    </ul>
+                `
+            });
+
+            if (!emailSent) {
+                logger.error('Failed to send contact form notification email');
+                return fail(500, {
+                    type: 'error',
+                    error: 'Failed to send message'
+                });
+            }
 
             return {
                 type: 'success',

@@ -3,19 +3,19 @@
 </script>
 
 <svelte:head>
-	<title>Security Policy | BrandVigilante</title>
-	<meta name="description" content="Learn about BrandVigilante's security measures and how we protect your data." />
+	<title>Security Policy | JanusIPM</title>
+	<meta name="description" content="Learn about JanusIPM's security measures and how we protect your data." />
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 	<h1 class="text-3xl font-bold mb-8">Security Policy</h1>
 	
-	<div class="prose dark:prose-invert max-w-none">
-		<p class="text-gray-600 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+	<div class="prose max-w-none">
+		<p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">Our Security Commitment</h2>
-			<p>At BrandVigilante, we are committed to protecting your data and maintaining the security of our systems. We implement industry-standard security measures and continuously update our security practices to address emerging threats.</p>
+			<p>At JanusIPM, we are committed to protecting your data and maintaining the security of our systems. We implement industry-standard security measures and continuously update our security practices to address emerging threats.</p>
 		</section>
 
 		<section class="mb-8">
@@ -95,9 +95,9 @@
 			<h2 class="text-2xl font-semibold mb-4">Reporting Security Issues</h2>
 			<p>If you discover a security vulnerability or have concerns about our security measures, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>Email: security@brandvigilante.com</li>
+				<li>Email: security@janusipm.com</li>
 				<li>Phone: (555) 123-4567</li>
-				<li>For urgent security issues: security-emergency@brandvigilante.com</li>
+				<li>For urgent security issues: security-emergency@janusipm.com</li>
 			</ul>
 		</section>
 	</div>

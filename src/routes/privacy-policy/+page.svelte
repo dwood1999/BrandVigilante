@@ -3,19 +3,19 @@
 </script>
 
 <svelte:head>
-	<title>Privacy Policy | BrandVigilante</title>
-	<meta name="description" content="BrandVigilante's Privacy Policy - Learn how we collect, use, and protect your personal information." />
+	<title>Privacy Policy | JanusIPM</title>
+	<meta name="description" content="JanusIPM's Privacy Policy - Learn how we collect, use, and protect your personal information." />
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 	<h1 class="text-3xl font-bold mb-8">Privacy Policy</h1>
 	
-	<div class="prose dark:prose-invert max-w-none">
-		<p class="text-gray-600 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+	<div class="prose max-w-none">
+		<p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">1. Introduction</h2>
-			<p>Welcome to BrandVigilante. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.</p>
+			<p>Welcome to JanusIPM. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you about how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.</p>
 		</section>
 
 		<section class="mb-8">
@@ -71,7 +71,7 @@
 			<h2 class="text-2xl font-semibold mb-4">7. Contact Us</h2>
 			<p>If you have any questions about this Privacy Policy, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>By email: privacy@brandvigilante.com</li>
+				<li>By email: privacy@janusipm.com</li>
 				<li>By visiting the contact page on our website</li>
 			</ul>
 		</section>
@@ -173,10 +173,10 @@
 			<h2 class="text-2xl font-semibold mb-4">14. Contact Us</h2>
 			<p>If you have any questions about this Privacy Policy, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>By email: privacy@brandvigilante.com</li>
+				<li>By email: privacy@janusipm.com</li>
 				<li>By visiting the contact page on our website</li>
-				<li>For CCPA requests: donotsell@brandvigilante.com</li>
-				<li>For GDPR requests: gdpr@brandvigilante.com</li>
+				<li>For CCPA requests: donotsell@janusipm.com</li>
+				<li>For GDPR requests: gdpr@janusipm.com</li>
 			</ul>
 		</section>
 	</div>

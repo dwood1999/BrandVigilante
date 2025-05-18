@@ -3,24 +3,24 @@
 </script>
 
 <svelte:head>
-	<title>Terms of Service | BrandVigilante</title>
-	<meta name="description" content="BrandVigilante's Terms of Service - Learn about the terms and conditions for using our trademark monitoring and enforcement services." />
+	<title>Terms of Service | JanusIPM</title>
+	<meta name="description" content="JanusIPM's Terms of Service - Learn about the terms and conditions for using our trademark monitoring and enforcement services." />
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 	<h1 class="text-3xl font-bold mb-8">Terms of Service</h1>
 	
-	<div class="prose dark:prose-invert max-w-none">
-		<p class="text-gray-600 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+	<div class="prose max-w-none">
+		<p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">1. Agreement to Terms</h2>
-			<p>By accessing or using BrandVigilante's services, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access our services.</p>
+			<p>By accessing or using JanusIPM's services, you agree to be bound by these Terms of Service. If you disagree with any part of the terms, you may not access our services.</p>
 		</section>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">2. Description of Service</h2>
-			<p>BrandVigilante provides trademark monitoring and enforcement services, including:</p>
+			<p>JanusIPM provides trademark monitoring and enforcement services, including:</p>
 			<ul class="list-disc pl-6 mt-4">
 				<li>Trademark monitoring and detection</li>
 				<li>Infringement analysis and reporting</li>
@@ -41,7 +41,7 @@
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">4. Intellectual Property</h2>
-			<p>The Service and its original content, features, and functionality are owned by BrandVigilante and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
+			<p>The Service and its original content, features, and functionality are owned by JanusIPM and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.</p>
 		</section>
 
 		<section class="mb-8">
@@ -62,7 +62,7 @@
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">7. Limitation of Liability</h2>
-			<p>In no event shall BrandVigilante be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.</p>
+			<p>In no event shall JanusIPM be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses.</p>
 		</section>
 
 		<section class="mb-8">
@@ -79,7 +79,7 @@
 			<h2 class="text-2xl font-semibold mb-4">10. Contact Us</h2>
 			<p>If you have any questions about these Terms, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>By email: legal@brandvigilante.com</li>
+				<li>By email: legal@janusipm.com</li>
 				<li>By visiting the contact page on our website</li>
 			</ul>
 		</section>

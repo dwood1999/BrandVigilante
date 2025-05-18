@@ -13,6 +13,8 @@
 
     interface FormErrors {
         error?: string;
+        success?: boolean;
+        message?: string;
         fieldErrors?: {
             term?: string;
             brandId?: string;
@@ -23,7 +25,8 @@
     export let form: FormErrors | null = null;
     export let loading = false;
     export let initialData: { term?: string; brand_id?: number } = {};
-    export let onSubmit: () => any;
+    export let onSubmit: (result: FormResult) => void;
+    export let onInput: () => void;
 
     let term = initialData.term || '';
     let brandId = '';
@@ -40,16 +43,46 @@
 
 <form
     method="POST"
+    action="?/update"
     class="space-y-6"
+    on:input={onInput}
     use:enhance={({ formData, cancel }) => {
-        return async ({ result, update }) => {
+        return async ({ result }) => {
             if (onSubmit) {
-                onSubmit({ type: result.type, data: result.data } as any);
+                onSubmit({ type: result.type, data: result.data } as FormResult);
             }
-            await update();
+            // Only update the form if it was successful
+            if (result.type === 'success') {
+                // Reload the page to get fresh data
+                window.location.reload();
+            }
         };
     }}
 >
+    {#if form?.error}
+        <div class="rounded-md bg-red-50 p-4">
+            <div class="flex">
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">
+                        {form.error}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    {#if form?.success}
+        <div class="rounded-md bg-green-50 p-4">
+            <div class="flex">
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-green-800">
+                        {form.message || 'Term updated successfully!'}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    {/if}
+
     <div class="space-y-6">
         <div>
             <label for="brand" class="block text-sm font-medium leading-6 text-gray-900">
@@ -69,8 +102,8 @@
                     {/each}
                 </select>
             </div>
-            {#if form?.error && form.error.includes('brand')}
-                <p class="mt-2 text-sm text-red-600">{form.error}</p>
+            {#if form?.fieldErrors?.brandId}
+                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.brandId}</p>
             {/if}
         </div>
 
@@ -88,23 +121,11 @@
                     class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
                 />
             </div>
-            {#if form?.error && form.error.includes('term')}
-                <p class="mt-2 text-sm text-red-600">{form.error}</p>
+            {#if form?.fieldErrors?.term}
+                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.term}</p>
             {/if}
         </div>
     </div>
-
-    {#if form?.error && !form.error.includes('term') && !form.error.includes('brand')}
-        <div class="rounded-md bg-red-50 p-4">
-            <div class="flex">
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">
-                        {form.error}
-                    </h3>
-                </div>
-            </div>
-        </div>
-    {/if}
 
     <div class="flex justify-end gap-x-3">
         <a

@@ -124,7 +124,7 @@
 <svelte:window on:click={handleClickOutside} on:keydown={handleKeydown} />
 
 <nav
-    class="fixed w-full z-50 transition-all duration-200 {isScrolled ? 'bg-white shadow-lg dark:bg-gray-800' : 'bg-transparent'}"
+    class="fixed w-full z-50 transition-all duration-200 {isScrolled ? 'bg-white shadow-lg' : 'bg-transparent'}"
     aria-label="Main navigation"
 >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -142,8 +142,8 @@
                             href={item.href}
                             class="inline-flex items-center px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-md min-h-[44px] {$page.url.pathname === item.href ||
                             ($page.url.pathname.startsWith(item.href) && item.href !== '/')
-                                ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' // Subtle background for active link
-                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                ? 'bg-blue-100 text-blue-700' // Subtle background for active link
+                                : 'text-gray-500 hover:bg-gray-100 hover:text-gray-900'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             aria-current={$page.url.pathname === item.href ? 'page' : undefined}
                         >
                             {item.label}
@@ -178,7 +178,7 @@
 
                             {#if userMenuOpen}
                                 <div
-                                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-700 focus:outline-none"
+                                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
                                     role="menu"
                                     id="user-menu-content"
                                     aria-orientation="vertical"
@@ -188,7 +188,7 @@
                                 >
                                     <a
                                         href="/profile"
-                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                        class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                         role="menuitem"
                                         tabindex="-1"
                                         on:click={closeMenus}
@@ -212,7 +212,7 @@
                                     >
                                         <button
                                             type="submit"
-                                            class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+                                            class="block w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-gray-100"
                                             role="menuitem"
                                             tabindex="-1"
                                         >
@@ -228,9 +228,9 @@
                     <div class="flex items-center space-x-2">
                         <a
                             href="/sign-in"
-                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-md min-h-[44px] text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 {$page.url.pathname ===
+                            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-md min-h-[44px] text-gray-700 hover:bg-gray-100 {$page.url.pathname ===
                             '/sign-in'
-                                ? 'bg-gray-100 dark:bg-gray-700'
+                                ? 'bg-gray-100'
                                 : ''}"
                             aria-current={$page.url.pathname === '/sign-in' ? 'page' : undefined}
                         >
@@ -250,7 +250,7 @@
             <div class="flex items-center sm:hidden">
                 <button
                     type="button"
-                    class="menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 min-w-[44px] min-h-[44px]"
+                    class="menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 min-w-[44px] min-h-[44px]"
                     aria-controls="mobile-menu"
                     aria-expanded={isOpen}
                     on:click={() => (isOpen = !isOpen)}
@@ -294,7 +294,7 @@
     <!-- Mobile menu -->
     {#if isOpen}
         <div
-            class="sm:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+            class="sm:hidden border-t border-gray-200 bg-white"
             id="mobile-menu"
             transition:slide={{ duration: 200 }}
         >
@@ -304,8 +304,8 @@
                     <a
                         href={item.href}
                         class="block px-3 py-3 text-base font-medium rounded-md {$page.url.pathname === item.href
-                            ? 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900'
-                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700'}"
+                            ? 'text-blue-700 bg-blue-100'
+                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}"
                         aria-current={$page.url.pathname === item.href ? 'page' : undefined}
                         on:click={closeMenus}
                     >
@@ -316,8 +316,8 @@
                 <a
                     href="/about"
                     class="block px-3 py-3 text-base font-medium rounded-md {$page.url.pathname === '/about'
-                        ? 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700'}"
+                        ? 'text-blue-700 bg-blue-100'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}"
                     aria-current={$page.url.pathname === '/about' ? 'page' : undefined}
                     on:click={closeMenus}
                 >
@@ -326,8 +326,8 @@
                 <a
                     href="/contact"
                     class="block px-3 py-3 text-base font-medium rounded-md {$page.url.pathname === '/contact'
-                        ? 'text-blue-700 bg-blue-100 dark:text-blue-300 dark:bg-blue-900'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700'}"
+                        ? 'text-blue-700 bg-blue-100'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}"
                     aria-current={$page.url.pathname === '/contact' ? 'page' : undefined}
                     on:click={closeMenus}
                 >
@@ -335,7 +335,7 @@
                 </a>
             </div>
             {#if $page.data.user}
-                <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+                <div class="pt-4 pb-3 border-t border-gray-200">
                     <div class="flex items-center px-5">
                         <div class="flex-shrink-0">
                             <!-- Increased size for touch target -->
@@ -346,16 +346,16 @@
                             </div>
                         </div>
                         <div class="ml-3">
-                            <div class="text-base font-medium text-gray-800 dark:text-white">
+                            <div class="text-base font-medium text-gray-800">
                                 {$page.data.user.first_name} {$page.data.user.last_name}
                             </div>
-                            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">{$page.data.user.email}</div>
+                            <div class="text-sm font-medium text-gray-500">{$page.data.user.email}</div>
                         </div>
                     </div>
                     <div class="mt-3 px-2 space-y-1">
                         <a
                             href="/profile"
-                            class="block px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-md"
+                            class="block px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
                             on:click={closeMenus}
                         >
                             Your Profile
@@ -375,7 +375,7 @@
                         >
                             <button
                                 type="submit"
-                                class="block w-full text-left px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-md"
+                                class="block w-full text-left px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
                             >
                                 Sign out
                             </button>
@@ -383,18 +383,18 @@
                     </div>
                 </div>
             {:else}
-                <div class="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+                <div class="pt-4 pb-3 border-t border-gray-200">
                     <div class="px-2 space-y-1">
                         <a
                             href="/sign-in"
-                            class="block px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 rounded-md"
+                            class="block px-3 py-3 text-base font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md"
                             on:click={closeMenus}
                         >
                             Sign in
                         </a>
                         <a
                             href="/sign-up"
-                            class="block px-3 py-3 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 rounded-md"
+                            class="block px-3 py-3 text-base font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-100 rounded-md"
                             on:click={closeMenus}
                         >
                             Sign up

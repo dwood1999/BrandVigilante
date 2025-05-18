@@ -76,7 +76,7 @@
 
 <div class="container mx-auto px-4 py-8">
     <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Product Listings</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Product Listings</h1>
         <div class="flex flex-wrap items-center gap-4">
             <div class="relative">
                 <input
@@ -84,13 +84,13 @@
                     placeholder="Search listings..."
                     bind:value={searchInput}
                     on:input={handleSearch}
-                    class="block w-full rounded-md shadow-sm min-h-[44px] px-3 py-2 border border-input bg-background focus:border-ring focus:ring-ring focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-input dark:border-border dark:text-white"
+                    class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 />
             </div>
             <select
                 bind:value={selectedPerPage}
                 on:change={handlePerPageChange}
-                class="block w-full rounded-md shadow-sm min-h-[44px] pl-3 pr-10 py-2 border border-input bg-background focus:border-ring focus:ring-ring focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-input dark:border-border dark:text-white"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
             >
                 <option value="10">10 per page</option>
                 <option value="25">25 per page</option>
@@ -100,71 +100,71 @@
         </div>
     </div>
 
-    <div class="hidden md:block bg-white dark:bg-card shadow-md rounded-lg overflow-hidden">
+    <div class="hidden md:block bg-white shadow-md rounded-lg overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-800">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-[30%]">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[30%]">
                             Product
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Marketplace
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Seller
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Price
                         </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Created
                         </th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-card divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="bg-white divide-y divide-gray-200">
                     {#each listings as listing (listing.id)}
                         <tr>
                             <td class="px-6 py-4 w-[30%]">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white break-words">{listing.product_title}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                <div class="text-sm font-medium text-gray-900 break-words">{listing.product_title}</div>
+                                <div class="text-sm text-gray-500">
                                     UPC: {listing.product_upc ?? 'N/A'} | EAN: {listing.product_ean ?? 'N/A'}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">{listing.marketplace_name}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">{listing.marketplace_country}</div>
+                                <div class="text-sm text-gray-900">{listing.marketplace_name}</div>
+                                <div class="text-sm text-gray-500">{listing.marketplace_country}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 {#if listing.seller_id}
-                                    <div class="text-sm text-gray-900 dark:text-white">
-                                        <a href={listing.seller_url} target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400">
+                                    <div class="text-sm text-gray-900">
+                                        <a href={listing.seller_url} target="_blank" rel="noopener noreferrer" class="hover:text-blue-600">
                                             {listing.seller_name}
                                         </a>
                                     </div>
                                     {#if listing.is_buybox_winner}
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             Buy Box Winner
                                         </span>
                                     {/if}
                                 {:else}
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">No seller assigned</div>
+                                    <div class="text-sm text-gray-500">No seller assigned</div>
                                 {/if}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">
+                                <div class="text-sm text-gray-900">
                                     {listing.price} {listing.currency}
                                 </div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {new Date(listing.created_at).toLocaleDateString()}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href={listing.url} target="_blank" rel="noopener noreferrer"
-                                   class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                   class="text-blue-600 hover:text-blue-900">
                                     View Listing
                                 </a>
                             </td>
@@ -177,7 +177,7 @@
 
     <div class="block md:hidden space-y-4">
         {#each listings as listing (listing.id)}
-            <Card class="dark:bg-gray-800">
+            <Card>
                 <CardHeader class="pb-2">
                     <CardTitle class="text-base break-words">{listing.product_title}</CardTitle>
                     <CardDescription>
@@ -186,28 +186,28 @@
                 </CardHeader>
                 <CardContent class="space-y-2 text-sm">
                     <div>
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Marketplace:</span> 
+                        <span class="font-medium text-gray-700">Marketplace:</span> 
                         {listing.marketplace_name} ({listing.marketplace_country})
                     </div>
                     <div>
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Seller:</span> 
+                        <span class="font-medium text-gray-700">Seller:</span> 
                         {#if listing.seller_id}
-                            <a href={listing.seller_url} target="_blank" rel="noopener noreferrer" class="hover:text-blue-600 dark:hover:text-blue-400">
+                            <a href={listing.seller_url} target="_blank" rel="noopener noreferrer" class="hover:text-blue-600">
                                 {listing.seller_name}
                             </a>
                             {#if listing.is_buybox_winner}
                                 <Badge variant="success" class="ml-2">Buy Box</Badge>
                             {/if}
                         {:else}
-                            <span class="text-gray-500 dark:text-gray-400">N/A</span>
+                            <span class="text-gray-500">N/A</span>
                         {/if}
                     </div>
                     <div>
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Price:</span> 
+                        <span class="font-medium text-gray-700">Price:</span> 
                         {listing.price} {listing.currency}
                     </div>
                     <div>
-                        <span class="font-medium text-gray-700 dark:text-gray-300">Created:</span> 
+                        <span class="font-medium text-gray-700">Created:</span> 
                         {new Date(listing.created_at).toLocaleDateString()}
                     </div>
                     <div class="pt-2">
@@ -226,7 +226,7 @@
     </div>
 
     <div class="mt-6 flex flex-wrap items-center justify-between gap-4">
-        <div class="text-sm text-gray-700 dark:text-gray-300">
+        <div class="text-sm text-gray-700">
             Showing <span class="font-medium">{startRecord}</span> to{' '}
             <span class="font-medium">{endRecord}</span> of{' '}
             <span class="font-medium">{pagination.total}</span> results
@@ -248,7 +248,7 @@
             >
                 Previous
             </Button>
-            <span class="px-3 py-1 text-sm text-gray-700 dark:text-gray-400">
+            <span class="px-3 py-1 text-sm text-gray-700">
                 Page {currentPage} of {totalPages}
             </span>
             <Button

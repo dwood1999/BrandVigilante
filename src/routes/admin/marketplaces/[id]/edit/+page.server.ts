@@ -1,7 +1,8 @@
-import { error, redirect } from '@sveltejs/kit';
+import { error, redirect, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { MarketplaceModel } from '$lib/models/marketplace';
 import type { Marketplace } from '$lib/models/marketplace';
+import { logger } from '$lib/logger';
 
 interface PageData {
     marketplace: Marketplace;
@@ -53,29 +54,40 @@ export const load = (async ({ params, locals }): Promise<PageData> => {
 }) satisfies PageServerLoad;
 
 export const actions = {
-    default: async ({ request, params }) => {
+    update: async ({ request, params }) => {
         const formData = await request.formData();
         const id = parseInt(params.id);
 
         if (!id) {
-            return {
-                success: false,
-                error: 'Invalid marketplace ID'
-            };
+            return fail(400, { error: 'Invalid marketplace ID' });
         }
 
         try {
-            const platformName = formData.get('platform_name')?.toString();
-            const baseUrl = formData.get('base_url')?.toString();
-            const currencyCode = formData.get('currency_code')?.toString();
-            const countryCode = formData.get('country_code')?.toString();
-            const externalId = formData.get('external_id')?.toString();
+            const platformName = formData.get('platform_name')?.toString().trim();
+            const baseUrl = formData.get('base_url')?.toString().trim();
+            const currencyCode = formData.get('currency_code')?.toString().trim();
+            const countryCode = formData.get('country_code')?.toString().trim();
+            const externalId = formData.get('external_id')?.toString().trim();
 
             if (!platformName || !baseUrl || !currencyCode || !countryCode) {
-                return {
-                    success: false,
-                    error: 'Missing required fields'
-                };
+                return fail(400, { 
+                    error: 'Missing required fields',
+                    fieldErrors: {
+                        platform_name: !platformName ? 'Platform name is required' : undefined,
+                        base_url: !baseUrl ? 'Base URL is required' : undefined,
+                        currency_code: !currencyCode ? 'Currency code is required' : undefined,
+                        country_code: !countryCode ? 'Country code is required' : undefined
+                    }
+                });
+            }
+
+            if (!isValidUrl(baseUrl)) {
+                return fail(400, { 
+                    error: 'Please enter a valid URL',
+                    fieldErrors: {
+                        base_url: 'Please enter a valid URL'
+                    }
+                });
             }
 
             await MarketplaceModel.update(id, {
@@ -86,18 +98,31 @@ export const actions = {
                 external_id: externalId || undefined
             });
 
-            return {
-                type: 'redirect',
-                location: '/admin/marketplaces'
+            return { 
+                success: true,
+                message: 'Marketplace updated successfully!'
             };
         } catch (err) {
-            console.error('Error updating marketplace:', err);
-            return {
-                type: 'failure',
+            logger.error('Error updating marketplace:', err);
+            return fail(500, { 
+                error: err instanceof Error ? err.message : 'Failed to update marketplace',
                 data: {
-                    error: err instanceof Error ? err.message : 'An unexpected error occurred'
+                    platform_name: platformName,
+                    base_url: baseUrl,
+                    currency_code: currencyCode,
+                    country_code: countryCode,
+                    external_id: externalId
                 }
-            };
+            });
         }
     }
-} satisfies Actions; 
+} satisfies Actions;
+
+function isValidUrl(url: string): boolean {
+    try {
+        new URL(url);
+        return true;
+    } catch {
+        return false;
+    }
+} 

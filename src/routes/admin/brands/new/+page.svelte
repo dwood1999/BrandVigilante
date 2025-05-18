@@ -24,10 +24,11 @@
     
     let loading = false;
     let name = '';
+    let display_name = '';
     let url = '';
     let description = '';
 
-    $: isValid = name.trim().length > 0;
+    $: isValid = name.trim().length > 0 && display_name.trim().length > 0;
 </script>
 
 <svelte:head>
@@ -99,6 +100,25 @@
                             </div>
                             {#if form?.fieldErrors?.name}
                                 <p class="mt-2 text-sm text-red-600">{form.fieldErrors.name}</p>
+                            {/if}
+                        </div>
+
+                        <div>
+                            <label for="display_name" class="block text-sm font-medium leading-6 text-gray-900">
+                                Display Name
+                            </label>
+                            <div class="mt-2">
+                                <input
+                                    type="text"
+                                    name="display_name"
+                                    id="display_name"
+                                    bind:value={display_name}
+                                    required
+                                    class="block w-full rounded-md border-0 py-3 px-4 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                            {#if form?.fieldErrors?.display_name}
+                                <p class="mt-2 text-sm text-red-600">{form.fieldErrors.display_name}</p>
                             {/if}
                         </div>
 

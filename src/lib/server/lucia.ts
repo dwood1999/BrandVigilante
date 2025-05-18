@@ -19,7 +19,7 @@ export const auth = new Lucia(
     {
         sessionExpiresIn: new TimeSpan(30, "d"),
         sessionCookie: {
-            expires: false,
+            expires: false
         },
         getUserAttributes: (attributes) => {
             return {

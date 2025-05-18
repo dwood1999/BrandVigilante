@@ -3,15 +3,15 @@
 </script>
 
 <svelte:head>
-	<title>California Privacy Rights | BrandVigilante</title>
+	<title>California Privacy Rights | JanusIPM</title>
 	<meta name="description" content="Learn about your privacy rights under the California Consumer Privacy Act (CCPA) and how to exercise them." />
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8 max-w-4xl">
 	<h1 class="text-3xl font-bold mb-8">California Privacy Rights</h1>
 	
-	<div class="prose dark:prose-invert max-w-none">
-		<p class="text-gray-600 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
+	<div class="prose max-w-none">
+		<p class="text-gray-600 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
 		<section class="mb-8">
 			<h2 class="text-2xl font-semibold mb-4">Your Rights Under the CCPA</h2>
@@ -31,7 +31,7 @@
 			<p>You can exercise your CCPA rights through the following methods:</p>
 			<ul class="list-disc pl-6 mt-4">
 				<li>Submit a request through our online form</li>
-				<li>Email us at privacy@brandvigilante.com</li>
+				<li>Email us at privacy@janusipm.com</li>
 				<li>Call us at (555) 123-4567</li>
 				<li>Mail your request to our physical address</li>
 			</ul>
@@ -71,7 +71,7 @@
 			<p>You have the right to opt-out of the sale of your personal information. To exercise this right:</p>
 			<ul class="list-disc pl-6 mt-4">
 				<li>Click the "Do Not Sell My Personal Information" link in our website footer</li>
-				<li>Email us at donotsell@brandvigilante.com</li>
+				<li>Email us at donotsell@janusipm.com</li>
 				<li>Call us at (555) 123-4567</li>
 			</ul>
 		</section>
@@ -85,9 +85,9 @@
 			<h2 class="text-2xl font-semibold mb-4">Contact Us</h2>
 			<p>If you have any questions about your California privacy rights, please contact us:</p>
 			<ul class="list-none pl-6 mt-4">
-				<li>Email: privacy@brandvigilante.com</li>
+				<li>Email: privacy@janusipm.com</li>
 				<li>Phone: (555) 123-4567</li>
-				<li>Address: 123 Brand Protection Street, Suite 100, City, State 12345</li>
+				<li>Address: 1309 Coffeen Avenue STE 12352, Sheridan, Wyoming 82801, USA</li>
 			</ul>
 		</section>
 	</div>

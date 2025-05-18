@@ -37,38 +37,54 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 };
 
 export const actions: Actions = {
-    default: async ({ request, params }) => {
+    update: async ({ request, params }) => {
         const termId = parseInt(params.id);
         if (isNaN(termId)) {
             return fail(400, { error: 'Invalid term ID' });
         }
 
         const formData = await request.formData();
-        const brandId = formData.get('brandId')?.toString();
         const term = formData.get('term')?.toString().trim();
-
-        if (!brandId) {
-            return fail(400, { error: 'Please select a brand' });
-        }
+        const brandId = formData.get('brandId')?.toString();
 
         if (!term) {
-            return fail(400, { error: 'Trademark term is required' });
+            return fail(400, { 
+                error: 'Term is required',
+                fieldErrors: {
+                    term: 'Term is required'
+                }
+            });
+        }
+
+        if (!brandId) {
+            return fail(400, { 
+                error: 'Brand is required',
+                fieldErrors: {
+                    brandId: 'Brand is required'
+                }
+            });
         }
 
         try {
-            await TrademarkTermModel.update(termId, {
-                brand_id: parseInt(brandId),
-                term
+            const updatedTerm = await TrademarkTermModel.update(termId, {
+                term,
+                brand_id: parseInt(brandId)
             });
 
-            return { success: true };
+            return { 
+                success: true,
+                message: 'Term updated successfully!',
+                data: updatedTerm
+            };
         } catch (error) {
-            if (error instanceof Error && error.message.includes('already exists')) {
-                return fail(400, { error: error.message });
-            }
-            
-            logger.error('Error updating trademark term:', error);
-            return fail(500, { error: 'Failed to update trademark term' });
+            logger.error('Error updating term:', error);
+            return fail(500, { 
+                error: 'Failed to update term',
+                data: {
+                    term,
+                    brand_id: brandId
+                }
+            });
         }
     }
 }; 

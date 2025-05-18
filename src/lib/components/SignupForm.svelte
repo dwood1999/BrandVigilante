@@ -52,10 +52,6 @@
                 body: JSON.stringify({ firstName, lastName, email, company, phone })
             });
             const result = await response.json();
-            if (response.status === 400 && result.message && result.message.includes('already exists')) {
-                window.location.href = `/sign-in?message=${encodeURIComponent('This email already exists as a user. Please sign in.')}`;
-                return;
-            }
             if (result.success) {
                 message = result.message || "Thank you for your inquiry! We will be in touch soon.";
                 messageType = 'success';
@@ -92,13 +88,13 @@
 
     {#if $formStore.isOpen}
         <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;">
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-lg max-w-md w-full p-6 space-y-6" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-lg max-w-md w-full p-6 space-y-6" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
                 <div class="flex justify-between items-center mb-2">
                     <h2 class="text-2xl font-bold text-foreground">Get More Information</h2>
                     <button
                         type="button"
                         onclick={closeForm}
-                        class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        class="text-gray-500 hover:text-gray-700"
                         aria-label="Close signup form"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
